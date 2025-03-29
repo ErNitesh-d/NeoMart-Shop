@@ -23,10 +23,31 @@ Built with Java Spring Boot, Thymeleaf, HTML, CSS, JavaScript, and MySQL, NeoMar
 
 ✅ Admin Dashboard – Manage products, orders, customers, and payments.
 
-![Uploading screencapture-localhost-8080-2025-03-28-11_25_41.png…]()
+![screencapture-localhost-8080-2025-03-28-11_25_41](https://github.com/user-attachments/assets/791b6293-86e6-421c-adb6-2a36f80fb8a2)
+re-localhost-8080-2025-03-28-11_25_41.png…]()
 
 
 ![screencapture-localhost-8080-register-2025-03-28-11_29_57](https://github.com/user-attachments/assets/ab3e06b3-245a-4541-828a-79455c05ce80)
 
 
 ![screencapture-localhost-8080-signin-2025-03-28-11_34_00](https://github.com/user-attachments/assets/db78bddf-f88a-4abf-a000-90f76f0ba1c0)
+
+
+![screencapture-localhost-8080-products-2025-03-28-12_26_05](https://github.com/user-attachments/assets/378d00cd-6359-4fbe-8023-ef71644cf7dc)
+
+\
+
+![screencapture-localhost-8080-user-profile-2025-03-28-12_36_24](https://github.com/user-attachments/assets/8676241a-7841-4e33-aef4-809924b1ffa2)
+
+
+
+![screencapture-localhost-8080-user-wishlist-17-2025-03-28-12_44_50](https://github.com/user-attachments/assets/71a50752-1669-4047-a537-46d8c70e20ae)
+
+
+
+![screencapture-localhost-8080-user-cart-2025-03-28-12_45_11](https://github.com/user-attachments/assets/e89ecd18-f088-4052-bc34-d3e62d2b14e9)
+
+
+![screencapture-localhost-8080-user-reviews-3-17-278-2025-03-28-14_47_14](https://github.com/user-attachments/assets/8aae90da-7226-4d5e-b1eb-3fdcc3e72fef)
+
+
