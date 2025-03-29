@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{base::layout(~{::section},'Products')}">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Product Page</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body >
+    <section>
+        <!-- Theme Container -->
+        <div class="theme-container" id="themeContainer" style="overflow: hidden;transition: all 0.3s ease; 
+		padding: 0rem; border-radius: 12px; margin-top: 2rem;margin-bottom: 0%;background-color: white;">
+            <!-- Theme Toggle Button -->
+			<!-- Search Section -->
+			<div class="container-fluid p-5 search-container" style="background:  rgb(7, 121, 248); border-radius: 0px; 
+			margin-top: 1.5rem; transition: all 0.4s ease; overflow: visible; box-shadow: 0 15px 40px rgba(0,0,0,0.2); animation: gradientShift 15s ease infinite; position: relative;">
+			    <!-- Animated background elements -->
+			    <div class="animated-bg-elements">
+			        <div style="position: absolute; top: 15%; left: 5%; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%; filter: blur(20px); animation: floatElement 8s ease-in-out infinite;"></div>
+			        <div style="position: absolute; bottom: 10%; right: 8%; width: 80px; height: 80px; background: rgba(255,255,255,0.12); border-radius: 50%; filter: blur(15px); animation: floatElement 7s ease-in-out infinite 2s;"></div>
+			        <div style="position: absolute; top: 50%; left: 80%; width: 60px; height: 60px; background: rgba(255,255,255,0.08); border-radius: 50%; filter: blur(10px); animation: floatElement 10s ease-in-out infinite 1s;"></div>
+			    </div>
+
+			    <div class="row">
+			        <div class="col-md-8 offset-md-2" style="position: relative; z-index: 1000;">
+			            <form action="/search" method="get">
+			                <div class="input-group position-relative" style="animation: fadeInUp 0.8s ease-out forwards; position: relative; z-index: 1000;">
+			                    <input type="text" class="form-control search-input" name="ch" id="searchBox" placeholder="What are you looking for today?" onfocus="expandSearchBox()" onblur="resetSearchBox()" onkeyup="fetchSuggestions()" style="padding: 1.3rem 1.8rem; border-radius: 20px 0 0 20px; border: none; font-size: 1.1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.15); font-weight: 400; letter-spacing: 0.5px; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); outline: none; backdrop-filter: blur(5px); background: rgba(255, 255, 255, 0.95);">
+
+			                    <!-- Add user ID and product ID as hidden inputs -->
+			                    <th:block th:if="${user != null}">
+			                        <input type="hidden" name="uid" th:value="${user.id}" />
+			                    </th:block>
+			                    <th:block th:if="${p != null}">
+			                        <input type="hidden" name="pid" th:value="${p.id}" />
+			                    </th:block>
+			                    
+			                    <button class="btn search-btn ms-3 col-md-2" style="padding: 1.3rem; border-radius: 0 20px 20px 0; border: none; background: linear-gradient(45deg, #f72585, #ff0a54); color: white; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.95rem; position: relative; overflow: hidden;">
+			                        <span style="position: relative; z-index: 2;"><i class="fa-solid fa-magnifying-glass me-2"></i> Search</span>
+			                        <span style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(45deg, #ff0a54, #f72585); opacity: 0; transition: opacity 0.4s ease; z-index: 1;"></span>
+			                    </button>
+			                </div>
+			                
+			                <!-- Suggestions list with improved styling and z-index -->
+			                <div id="suggestionsContainer" style="position: relative; z-index: 9999;">
+			                    <ul id="suggestionsList" class="list-group position-absolute bg-white shadow suggestions-list" style="z-index: 9999; border-radius: 18px; width: 60%; margin-top: 13px; overflow: hidden; border: none; box-shadow: 0 20px 50px rgba(0,0,0,0.25); transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); opacity: 1; transform: translateY(0); left: 0; right: 0; margin-left: auto; margin-right: auto;"></ul>
+			                </div>
+			            </form>
+			        </div>
+			    </div>
+
+			    <style>
+			    @keyframes gradientShift {
+			        0% {
+			            background-position: 0% 50%;
+			        }
+			        50% {
+			            background-position: 100% 50%;
+			        }
+			        100% {
+			            background-position: 0% 50%;
+			        }
+			    }
+			    
+			    @keyframes floatElement {
+			        0% {
+			            transform: translateY(0) translateX(0);
+			        }
+			        50% {
+			            transform: translateY(-20px) translateX(15px);
+			        }
+			        100% {
+			            transform: translateY(0) translateX(0);
+			        }
+			    }
+			    
+			    @keyframes fadeInUp {
+			        from {
+			            opacity: 0;
+			            transform: translateY(20px);
+			        }
+			        to {
+			            opacity: 1;
+			            transform: translateY(0);
+			        }
+			    }
+			    
+			    @keyframes pulse {
+			        0% {
+			            transform: scale(1);
+			            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+			        }
+			        50% {
+			            transform: scale(1.03);
+			            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+			        }
+			        100% {
+			            transform: scale(1);
+			            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+			        }
+			    }
+			    
+			    @keyframes shimmer {
+			        0% {
+			            background-position: -200% 0;
+			        }
+			        100% {
+			            background-position: 200% 0;
+			        }
+			    }
+
+			    /* Important z-index fixes */
+			    .search-container {
+			        position: relative;
+			        z-index: 100;
+			    }
+			    
+			    .input-group.position-relative {
+			        position: relative;
+			        z-index: 1000;
+			    }
+			    
+			    #suggestionsContainer {
+			        position: relative;
+			        z-index: 9999;
+			    }
+			    
+			    #suggestionsList {
+			        position: absolute;
+			        z-index: 9999;
+			        width: 60%;
+			        left: 0;
+			        right: 0;
+			        margin-left: auto;
+			        margin-right: auto;
+			        display: none;
+			    }
+			    
+			    #suggestionsList.visible {
+			        display: block;
+			    }
+			    </style>
+			    
+			    <script>
+			    document.addEventListener('DOMContentLoaded', function() {
+			        // Set up initial states
+			        const suggestionsList = document.getElementById("suggestionsList");
+			        if (suggestionsList) {
+			            suggestionsList.style.display = "none"; // Initially hidden
+			        }
+			    });
+			    
+			    function expandSearchBox() {
+			        const searchBox = document.getElementById("searchBox");
+			        searchBox.style.transform = "scale(1.02)";
+			        searchBox.style.boxShadow = "0 15px 35px rgba(0,0,0,0.2)";
+			        
+			        // Show suggestions if there are already query results
+			        const query = searchBox.value.trim();
+			        if (query.length >= 3) {
+			            fetchSuggestions();
+			        }
+			    }
+			    
+			    function resetSearchBox() {
+			        const searchBox = document.getElementById("searchBox");
+			        searchBox.style.transform = "scale(1)";
+			        searchBox.style.boxShadow = "0 10px 25px rgba(0,0,0,0.15)";
+			        
+			        // Don't hide suggestions immediately to allow for clicking
+			        setTimeout(() => {
+			            if (!document.activeElement.closest('#suggestionsList')) {
+			                const suggestionsList = document.getElementById("suggestionsList");
+			                suggestionsList.style.display = "none";
+			            }
+			        }, 200);
+			    }
+			    
+			    function fetchSuggestions() {
+			        let searchBox = document.getElementById("searchBox");
+			        let suggestionsList = document.getElementById("suggestionsList");
+			        let query = searchBox.value.trim();
+
+			        if (query.length < 3) {
+			            suggestionsList.style.display = "none";
+			            return;
+			        }
+
+			        // Make sure the suggestions list is visible
+			        suggestionsList.style.display = "block";
+			        suggestionsList.style.opacity = "1";
+			        suggestionsList.style.transform = "translateY(0)";
+			        
+			        // Show loading animation while fetching
+			        suggestionsList.innerHTML = "<li class='list-group-item text-center' style='padding:15px;'>Searching...</li>";
+			        
+			        // Simulated delay to show loading animation (remove in production)
+			        setTimeout(() => {
+			            fetch(`/api/products/suggestions?query=${query}`)
+			                .then(response => response.json())
+			                .then(data => {
+			                    suggestionsList.innerHTML = "";
+
+			                    if (data.length === 0) {
+			                        let noProductItem = document.createElement("li");
+			                        noProductItem.classList.add("list-group-item");
+			                        noProductItem.innerHTML = "<i class='fa-solid fa-circle-exclamation me-2'></i> No products found";
+			                        // Enhanced "no product found" styling
+			                        noProductItem.style.fontSize = "15px";
+			                        noProductItem.style.padding = "15px 20px";
+			                        noProductItem.style.background = "linear-gradient(to right, #fff0f3, #ffecef)";
+			                        noProductItem.style.color = "#d90429";
+			                        noProductItem.style.border = "none";
+			                        noProductItem.style.borderRadius = "10px";
+			                        noProductItem.style.textAlign = "center";
+			                        noProductItem.style.margin = "10px auto";
+			                        noProductItem.style.width = "90%";
+			                        noProductItem.style.boxSizing = "border-box";
+			                        noProductItem.style.boxShadow = "0 5px 15px rgba(0,0,0,0.05)";
+			                        noProductItem.style.fontWeight = "500";
+			                        noProductItem.style.animation = "fadeInUp 0.5s ease-out forwards";
+
+			                        suggestionsList.appendChild(noProductItem);
+			                    } else {
+			                        data.forEach((suggestion, index) => {
+			                            let listItem = document.createElement("li");
+			                            listItem.classList.add("list-group-item");
+			                            listItem.innerHTML = `<i class="fa-solid fa-tag me-2" style="color: #4361ee; opacity: 0.7;"></i> ${suggestion}`;
+			                            listItem.onclick = function () {
+			                                searchBox.value = suggestion;
+			                                suggestionsList.style.display = "none";
+			                                
+			                                // Search box pulse animation when selection is made
+			                                searchBox.style.animation = "pulse 0.5s ease";
+			                                setTimeout(() => {
+			                                    searchBox.style.animation = "";
+			                                }, 500);
+			                            };
+
+			                            // Animated entrance for each item
+			                            listItem.style.animation = `fadeInUp 0.4s ease-out forwards ${index * 0.08}s`;
+			                            
+			                            // Enhanced suggestion items styling
+			                            listItem.style.fontSize = "15px";
+			                            listItem.style.padding = "16px 20px";
+			                            listItem.style.backgroundColor = index % 2 === 0 ? "#f8f9fa" : "#ffffff";
+			                            listItem.style.border = "none";
+			                            listItem.style.borderBottom = "1px solid #f0f0f0";
+			                            listItem.style.cursor = "pointer";
+			                            listItem.style.width = "100%";
+			                            listItem.style.transition = "all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+			                            listItem.style.fontWeight = "400";
+			                            listItem.style.letterSpacing = "0.3px";
+
+			                            // Enhanced hover effect
+			                            listItem.onmouseover = function() {
+			                                listItem.style.backgroundColor = "#e9f5ff";
+			                                listItem.style.paddingLeft = "25px";
+			                                listItem.style.color = "#4361ee";
+			                                listItem.style.transform = "scale(1.02)";
+			                                listItem.style.boxShadow = "0 5px 15px rgba(0,0,0,0.05)";
+			                                listItem.style.zIndex = "5";
+			                            };
+			                            listItem.onmouseout = function() {
+			                                listItem.style.backgroundColor = index % 2 === 0 ? "#f8f9fa" : "#ffffff";
+			                                listItem.style.paddingLeft = "20px";
+			                                listItem.style.color = "#212529";
+			                                listItem.style.transform = "scale(1)";
+			                                listItem.style.boxShadow = "none";
+			                                listItem.style.zIndex = "1";
+			                            };
+
+			                            // Apply dark mode styling if needed
+			                            if (document.body.classList.contains('dark-mode')) {
+			                                listItem.style.backgroundColor = index % 2 === 0 ? "#1e2a3a" : "#293b5f";
+			                                listItem.style.color = "#e9ecef";
+			                                listItem.style.borderColor = "#3d5a80";
+			                                
+			                                listItem.onmouseover = function() {
+			                                    listItem.style.backgroundColor = "#3d5a80";
+			                                    listItem.style.paddingLeft = "25px";
+			                                    listItem.style.color = "#ffffff";
+			                                    listItem.style.transform = "scale(1.02)";
+			                                };
+			                                listItem.onmouseout = function() {
+			                                    listItem.style.backgroundColor = index % 2 === 0 ? "#1e2a3a" : "#293b5f";
+			                                    listItem.style.paddingLeft = "20px";
+			                                    listItem.style.color = "#e9ecef";
+			                                    listItem.style.transform = "scale(1)";
+			                                };
+			                            }
+
+			                            suggestionsList.appendChild(listItem);
+			                        });
+			                    }
+			                })
+			                .catch(error => {
+			                    console.error("Error fetching suggestions:", error);
+			                    suggestionsList.innerHTML = "<li class='list-group-item text-center' style='padding:15px; color:#d90429;'><i class='fa-solid fa-triangle-exclamation me-2'></i>Oops! Something went wrong</li>";
+			                });
+			        }, 300); // Slight delay for visual feedback
+			    }
+			    
+			    // Add button hover effect
+			    document.addEventListener('DOMContentLoaded', function() {
+			        const searchBtn = document.querySelector('.search-btn');
+			        if (searchBtn) {
+			            searchBtn.addEventListener('mouseover', function() {
+			                const span = this.querySelector('span:last-child');
+			                span.style.opacity = "1";
+			            });
+			            searchBtn.addEventListener('mouseout', function() {
+			                const span = this.querySelector('span:last-child');
+			                span.style.opacity = "0";
+			            });
+			            searchBtn.addEventListener('mousedown', function() {
+			                this.style.transform = "scale(0.98)";
+			            });
+			            searchBtn.addEventListener('mouseup', function() {
+			                this.style.transform = "scale(1)";
+			            });
+			        }
+			        
+			        // Close suggestions when clicking outside
+			        document.addEventListener('click', function(event) {
+			            const suggestionsList = document.getElementById('suggestionsList');
+			            const searchBox = document.getElementById('searchBox');
+			            
+			            if (suggestionsList && 
+			                !suggestionsList.contains(event.target) && 
+			                event.target !== searchBox) {
+			                suggestionsList.style.display = 'none';
+			            }
+			        });
+			    });
+			    </script>
+			</div>           
+        
+            <!-- Products Section -->
+            <div class="card shadow-sm p-0 mb-0 bg-body-tertiary rounded products-container" style="border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important; transition: all 0.3s ease; border-radius: 15px !important;">
+				<!-- Categories Section -->
+				<div style="display: flex; align-items: center; justify-content: space-between; padding: 0 1rem;">
+				    <!-- Centered Title -->
+				    <h2 class="category-title text-center flex-grow-1" 
+				        style="font-weight: 700; margin-bottom: 2rem; transition: all 0.3s ease;">
+				        What are you shopping for today?
+				    </h2>
+
+				    <!-- Toggle Button at the End -->
+				    <button id="themeToggle" style="border: none; border-radius: 50%; width: 42px; height: 42px; 
+				        display: flex; align-items: center; justify-content: center; cursor: pointer; 
+				        box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: all 0.3s ease; background-color: #fff;" 
+				        aria-label="Toggle theme">
+				        <i class="fas fa-moon" style="font-size: 1.2rem;"></i>
+				    </button>
+				</div>
+
+			 <div class="row justify-content-center">
+                   <div class="col-md-2 text-center category-card" th:each="c : ${categories}" style="transition: all 0.3s ease;">
+                       <div class="card rounded-circle shadow-sm mb-5 mt-0 category-image" style="width: 150px; height: 150px; position: relative; overflow: hidden; margin: 0 auto; border: none; transition: transform 0.3s ease, box-shadow 0.3s ease;">
+                           <img th:src="@{'img/category_img/'+${c.imageName}}" alt="Category Image" style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; transition: transform 0.3s ease;">
+                           <a th:href="@{'/products?category=' + ${c.name}}" class="text-decoration-none category-link" style="position: absolute; bottom: 0; left: 0; right: 0; text-align: center; color: white; background-color: rgba(0, 0, 0, 0.7); padding: 8px 0; transition: all 0.3s ease;">
+                               <p class="category-title mb-0" style="font-weight: 600;">[[${c.name}]]</p>
+                           </a>
+                       </div>
+                   </div>
+               </div>
+				          
+				 <div class="card-body">
+                    <p class="fs-3 text-center product-heading" style="font-weight: 700; margin-bottom: 2rem; transition: all 0.3s ease;">Products</p>
+            
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+                    <script>
+						document.addEventListener("DOMContentLoaded", function() {
+						  // Get messages from session
+						  let successMsg = "[[${session.succMsg}]]";
+						  let errorMsg = "[[${session.errorMsg}]]";
+
+						  // Create more robust validation for message templates
+						  const hasValidSuccessMsg = successMsg && 
+						                          successMsg !== "null" && 
+						                          successMsg !== "[[${session.succMsg}]]" &&
+						                          !successMsg.includes("${session");
+						                          
+						  const hasValidErrorMsg = errorMsg && 
+						                        errorMsg !== "null" && 
+						                        errorMsg !== "[[${session.errorMsg}]]" &&
+						                        !errorMsg.includes("${session");
+
+						  // Track which page showed the message to prevent showing on other pages
+						  const currentPage = window.location.pathname;
+						  const messagePage = sessionStorage.getItem('messagePage');
+						  
+						  // Only show message if:
+						  // 1. We have a valid message AND
+						  // 2. Either we haven't shown a message yet OR we're on the same page where the action occurred
+						  const shouldShowMessage = (hasValidSuccessMsg || hasValidErrorMsg) && 
+						                           (!messagePage || messagePage === currentPage);
+						  
+						  // Show success message if conditions are met
+						  if (hasValidSuccessMsg && shouldShowMessage) {
+						    Swal.fire({
+						      icon: 'success',
+						      text: successMsg,
+						      toast: true,
+						      position: 'bottom',
+						      showConfirmButton: false,
+						      timer: 3000,
+						      background: 'rgba(0, 0, 0, 0.5)',
+						      color: '#fff',
+						      padding: '8px',
+						      width: '250px',
+						      customClass: {
+						        popup: 'small-toast'
+						      }
+						    });
+						    
+						    // Record that we've shown the message
+						    sessionStorage.setItem('messagePage', currentPage);
+						    
+						    // Clear the session message on the server
+						    fetch('/removeSessionMessage');
+						  }
+						  
+						  // Show error message if conditions are met
+						  if (hasValidErrorMsg && shouldShowMessage) {
+						    Swal.fire({
+						      icon: 'error',
+						      text: errorMsg,
+						      toast: true,
+						      position: 'bottom',
+						      showConfirmButton: false,
+						      timer: 3000,
+						      background: 'rgba(0, 0, 0, 0.5)',
+						      color: '#fff',
+						      padding: '8px',
+						      width: '250px',
+						      customClass: {
+						        popup: 'small-toast'
+						      }
+						    });
+						    
+						    // Record that we've shown the message
+						    sessionStorage.setItem('messagePage', currentPage);
+						    
+						    // Clear the session message on the server
+						    fetch('/removeSessionMessage');
+						  }
+						  
+						  // Initialize theme preference
+						  const isDarkMode = localStorage.getItem('darkMode') === 'true';
+						  if (isDarkMode) {
+						    enableDarkMode();
+						  }
+						  
+						  // Add a handler for form submissions to set action flag
+						  document.querySelectorAll('form').forEach(form => {
+						    form.addEventListener('submit', function() {
+						      // Clear previous message page when submitting a form
+						      sessionStorage.removeItem('messagePage');
+						    });
+						  });
+						});
+
+						// Add this to your links that trigger actions with messages
+						// For example, in your HTML for action links:
+						// <a href="/some-action" onclick="sessionStorage.removeItem('messagePage')">Do Action</a>
+                    </script>
+
+                    <style>
+                        .small-toast {
+                            font-size: 14px;
+                            border-radius: 8px;
+                            box-shadow: none;
+                        }
+                        
+                        /* Hover effect for product cards */
+                        .product-card {
+                            transition: all 0.3s ease;
+                            border-radius: 12px;
+                            border: none;
+                            overflow: hidden;
+                        }
+                        
+                        .product-card:hover {
+                            transform: translateY(-5px);
+                            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+                        }
+                        
+                        .img-container {
+                            overflow: hidden;
+                            border-radius: 12px 12px 0 0;
+                        }
+                        
+                        .img-container img {
+                            transition: transform 0.5s ease;
+                        }
+                        
+                        .product-card:hover .img-container img {
+                            transform: scale(1.05);
+                        }
+                        
+                        .heart-link {
+                            z-index: 2;
+                            transition: transform 0.3s ease;
+                        }
+                        
+                        .heart-link:hover {
+                            transform: scale(1.2);
+                        }
+                        
+                        .category-image:hover {
+                            transform: translateY(-5px);
+                            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+                        }
+                        
+                        .category-link {
+                            opacity: 0.9;
+                        }
+                        
+                        .category-image:hover .category-link {
+                            opacity: 1;
+                            background-color: rgba(67, 97, 238, 0.8);
+                        }
+                        
+                        .search-btn:hover {
+                            background-color: #2c41c2 !important;
+                        }
+                        
+                        .pagination .page-link {
+                            border-radius: 50%;
+                            margin: 0 3px;
+                            border: none;
+                            font-weight: 600;
+                            width: 40px;
+                            height: 40px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        }
+                        
+                        .pagination .page-item.active .page-link {
+                            background-color: #4361ee;
+                            color: white;
+                        }
+                        
+                        /* Dark mode styles */
+                        body.dark-mode .products-container {
+                            background-color: #16213e !important;
+                            color: #fff;
+                        }
+                        
+                        body.dark-mode .product-card {
+                            background-color: #293b5f;
+                            color: #fff;
+                        }
+                        
+                        body.dark-mode .search-container {
+                            background-color: #1e3a8a;
+                        }
+                        
+                        body.dark-mode .pagination .page-link {
+                            background-color: #293b5f;
+                            color: #fff;
+                        }
+                        
+                        body.dark-mode .pagination .page-item.active .page-link {
+                            background-color: #4361ee;
+                        }
+						
+						/* Add this to your existing style block */
+						body.dark-mode .search-input {
+						    background-color: #293b5f !important;
+						    color: #fff !important;
+						    border-color: #3d5a80 !important;
+						    box-shadow: 0 5px 15px rgba(0,0,0,0.3) !important;
+						}
+
+						body.dark-mode .search-input::placeholder {
+						    color: #adb5bd !important;
+						}
+
+						body.dark-mode .search-btn {
+						    background-color: #3d5a80 !important;
+						    box-shadow: 0 5px 15px rgba(0,0,0,0.3) !important;
+						}
+
+						body.dark-mode .suggestions-list {
+						    background-color: #1e2a3a !important;
+						    border-color: #3d5a80 !important;
+						}
+
+						body.dark-mode .suggestions-list .list-group-item {
+						    background-color: #293b5f !important;
+						    color: #fff !important;
+						    border-color: #3d5a80 !important;
+						}
+                    </style>
+
+                    <th:block th:if="${productsSize>0}"></th:block>
+
+                    <div class="row products-row" style="display: flex; flex-wrap: wrap; justify-content: space-around; margin: 0;">
+                        <th:block th:if="${productsSize>0}"></th:block>
+
+                        <div class="col-6 col-sm-6 col-md-4 col-lg-3 col-xl-3 product-column" 
+                             th:each="p:${products}" 
+                             style="padding: 0 5px; margin-bottom: 20px; box-sizing: border-box; position: relative;">
+
+                            <div class="card product-card" style="width: 100%; display: flex; flex-direction: column; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+                                
+                                <!-- Wishlist Button -->
+                                <th:block th:if="${user == null}">
+                                    <a href="/signin" class="heart-link" 
+                                       style="position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; text-decoration: none; color: gray; background-color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
+                                       <i class="fa-regular fa-heart"></i>
+                                    </a>
+                                </th:block>
+
+                                <th:block th:unless="${user == null}">
+                                    <a th:href="@{'/user/wishlist/'+${p.id}+'/'+${user.id}}" 
+                                       class="heart-link" 
+                                       onclick="toggleHeart(event, this)" 
+                                       style="position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; text-decoration: none; color: gray; background-color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.1); z-index: 2;">
+                                       <i th:class="${wishlistStatus.containsKey(p.id) and wishlistStatus[p.id] ? 'fa-solid fa-heart text-danger' : 'fa-regular fa-heart'}"></i>
+                                    </a>
+                                </th:block>
+
+                                <!-- Product Image -->
+                                <div class="img-container" style="width: 100%; height: 180px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; background-color: #f9f9f9;">
+                                    <img alt="" th:src="@{'/img/product_img/'+${p.image}}" style="max-width: 100%; max-height: 100%; object-fit: contain;"> 
+                                </div>
+
+                                <!-- Product Details -->
+                                <div class="card-body text-center product-details" style="padding: 1.2rem; flex-grow: 1;">
+                                    <h5 class="product-title" 
+                                        style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; font-size: 16px; font-weight: 600; margin-bottom: 0.8rem; transition: all 0.3s ease;">
+                                        [[${p.title}]]
+                                    </h5>
+
+                                    <div class="price-container" style="margin-bottom: 1rem;">
+                                        <p class="price" style="margin-bottom: 0.2rem; font-weight: 700; font-size: 18px; color: #4361ee;">
+                                            ₹[[${p.discountPrice}]]
+                                        </p>
+                                        <p class="original-price" style="margin-bottom: 0.2rem; font-size: 14px;">
+                                            <span class="text-decoration-line-through text-secondary">₹[[${p.price}]]</span>
+                                            <span class="discount-badge" style="font-size: 14px; color: #198754; background-color: rgba(25, 135, 84, 0.1); padding: 2px 8px; border-radius: 4px; margin-left: 5px;">[[${p.discount}]]% off</span>
+                                        </p>
+                                    </div>
+                                    
+                                    <a th:href="@{'/product/'+${p.id}}" class="btn btn-primary view-details-btn" style="width: 100%; padding: 8px; border-radius: 8px; background-color: #4361ee; border: none; transition: all 0.3s ease; font-weight: 600;">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <th:block th:unless="${productsSize>0}">
+                        <div class="no-products" style="text-align: center; padding: 3rem 0;">
+                            <i class="fas fa-box-open" style="font-size: 4rem; color: #ccc; margin-bottom: 1rem;"></i>
+                            <p class="fs-4 text-center text-danger mt-2">PRODUCT NOT AVAILABLE</p>
+                            <p class="text-muted">We couldn't find any products matching your criteria.</p>
+                        </div>
+                    </th:block>
+                    
+
+					<div class="row pagination-container" style="margin-top: 2rem;">
+					    <!-- Total Products Badge (left-aligned) -->
+					    <div class="col-md-4">
+					        <span class="badge bg-primary" style="font-size: 14px; padding: 8px 15px; border-radius: 8px;">Total Products: [[${totalElements}]]</span>
+					    </div>
+					    
+						<!-- Pagination Controls (centered) -->
+						<div class="col-md-4 d-flex justify-content-center">
+						    <th:block th:if="${productsSize > 0}">
+						        <nav aria-label="Page navigation">
+						            <ul class="pagination justify-content-center flex-wrap mb-0" style="max-width: 100%; overflow: hidden;">
+						                
+						                <!-- Previous Page Button -->
+						                <li class="page-item" th:classappend="${isFirst ? 'disabled' : ''}">
+						                    <a class="page-link" th:href="@{'/products?pageNo=' + ${pageNo - 1} + ${category != null ? '&category=' + category : ''} + ${search != null ? '&search=' + search : ''}}" aria-label="Previous">
+						                        <span aria-hidden="true">&laquo;</span>
+						                    </a>
+						                </li>
+									
+						                <!-- First Page (Show if current page > 4) -->
+						                <th:block th:if="${pageNo > 3}">
+						                    <li class="page-item">
+						                        <a class="page-link" th:href="@{'/products?pageNo=0' + ${category != null ? '&category=' + category : ''} + ${search != null ? '&search=' + search : ''}}">1</a>
+						                    </li>
+						                    <li class="page-item disabled"><span class="page-link">...</span></li>
+						                </th:block>
+
+						                <!-- Page Numbers -->
+						                <th:block th:each="i : ${#numbers.sequence(pageNo - 2, pageNo + 2)}" th:if="${i >= 0 && i < totalPages}">
+						                    <li class="page-item" th:classappend="${pageNo == i ? 'active' : ''}">
+						                        <a class="page-link" th:href="@{'/products?pageNo=' + ${i} + ${category != null ? '&category=' + category : ''} + ${search != null ? '&search=' + search : ''}}">[[${i + 1}]]</a>
+						                    </li>
+						                </th:block>
+
+						                <!-- Last Page (Show if current page is far from last page) -->
+						                <th:block th:if="${pageNo < totalPages - 4}">
+						                    <li class="page-item disabled"><span class="page-link">...</span></li>
+						                    <li class="page-item">
+						                        <a class="page-link" th:href="@{'/products?pageNo=' + ${totalPages - 1} + ${category != null ? '&category=' + category : ''} + ${search != null ? '&search=' + search : ''}}">[[${totalPages}]]</a>
+						                    </li>
+						                </th:block>
+
+						                <!-- Next Page Button -->
+						                <li class="page-item" th:classappend="${isLast ? 'disabled' : ''}">
+						                    <a class="page-link" th:href="@{'/products?pageNo=' + ${pageNo + 1} + ${category != null ? '&category=' + category : ''} + ${search != null ? '&search=' + search : ''}}" aria-label="Next">
+						                        <span aria-hidden="true">&raquo;</span>
+						                    </a>
+						                </li>
+								     </ul>
+						        </nav>
+						    </th:block>
+						</div>
+
+					    
+					
+					</div>
+					
+                </div>
+            </div>
+        </div>
+		<!-- Add this after a form submission or link that sets a session message -->
+		<script>
+		  sessionStorage.setItem('hasPerformedAction', 'true');
+		</script>
+        <script>
+
+			// Modify your heart-link click event handler
+			document.querySelectorAll(".heart-link").forEach(link => {
+			    link.addEventListener("click", function(event) {
+			        if (!this.href.includes('/signin')) {
+			            event.preventDefault();
+			            let url = this.getAttribute("href");
+			            let icon = this.querySelector("i");
+
+			            fetch(url, { method: "GET" })
+			                .then(response => response.text()) 
+			                .then(() => {
+			                    // Update the heart icon
+			                    if (icon.classList.contains("fa-regular")) {
+			                        icon.classList.remove("fa-regular");
+			                        icon.classList.add("fa-solid", "text-danger");
+			                        
+			                        // Show success toast when adding to wishlist
+			                        Swal.fire({
+			                            icon: 'success',
+			                            text: 'Added to wishlist successfully!',
+			                            toast: true,
+			                            position: 'bottom',
+			                            showConfirmButton: false,
+			                            timer: 3000,
+			                            background: 'rgba(0, 0, 0, 0.5)',
+			                            color: '#fff',
+			                            padding: '8px',
+			                            width: '250px',
+			                            customClass: { popup: 'small-toast' }
+			                        });
+			                    } else {
+			                        icon.classList.remove("fa-solid", "text-danger");
+			                        icon.classList.add("fa-regular");
+			                        
+			                        // Show info toast when removing from wishlist
+			                        Swal.fire({
+			                            icon: 'info',
+			                            text: 'Removed from wishlist!',
+			                            toast: true,
+			                            position: 'bottom',
+			                            showConfirmButton: false,
+			                            timer: 3000,
+			                            background: 'rgba(0, 0, 0, 0.5)',
+			                            color: '#fff',
+			                            padding: '8px',
+			                            width: '250px',
+			                            customClass: { popup: 'small-toast' }
+			                        });
+			                    }
+			                })
+			                .catch(error => {
+			                    console.error("Error:", error);
+			                    // Show error toast
+			                    Swal.fire({
+			                        icon: 'error',
+			                        text: 'Failed to update wishlist!',
+			                        toast: true,
+			                        position: 'bottom',
+			                        showConfirmButton: false,
+			                        timer: 3000,
+			                        background: 'rgba(0, 0, 0, 0.5)',
+			                        color: '#fff',
+			                        padding: '8px',
+			                        width: '250px',
+			                        customClass: { popup: 'small-toast' }
+			                    });
+			                });
+			        }
+			    });
+			});
+
+            // Theme toggle functionality
+			document.addEventListener("DOMContentLoaded", function () {
+			    const themeToggle = document.getElementById('themeToggle');
+			    
+			    if (themeToggle) {
+			        // Check for saved theme preference
+			        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+			        // Apply dark mode if previously enabled
+			        if (isDarkMode) {
+			            enableDarkMode();
+			        }
+
+			        // Add event listener for theme toggle button
+			        themeToggle.addEventListener('click', () => {
+			            if (document.body.classList.contains('dark-mode')) {
+			                disableDarkMode();
+			                localStorage.setItem('darkMode', 'false');
+			            } else {
+			                enableDarkMode();
+			                localStorage.setItem('darkMode', 'true');
+			            }
+			        });
+			    }
+			});
+			function enableDarkMode() {
+			    document.body.classList.add('dark-mode');
+			    
+			    // Theme toggle button
+			    const themeToggle = document.getElementById('themeToggle');
+			    const moonIcon = themeToggle.querySelector('i');
+			    themeToggle.style.backgroundColor = '#293b5f';
+			    moonIcon.classList.replace('fa-moon', 'fa-sun');
+			    moonIcon.style.color = '#ffd460';
+			    
+			    // Containers
+			    document.querySelector('.theme-container').style.backgroundColor = '#16213e';
+			    document.querySelector('.search-container').style.backgroundColor = '#1e3a8a';
+			    
+			    // Search input - Enhanced styling
+			    const searchInput = document.querySelector('.search-input');
+			    searchInput.style.backgroundColor = '#293b5f';
+			    searchInput.style.color = '#fff';
+			    searchInput.style.borderColor = '#3d5a80';
+			    searchInput.style.boxShadow = '0 5px 15px rgba(0,0,0,0.3)';
+			    
+			    // Search button dark styling
+			    const searchBtn = document.querySelector('.search-btn');
+			    if (searchBtn) {
+			        searchBtn.style.backgroundColor = '#3d5a80';
+			        searchBtn.style.boxShadow = '0 5px 15px rgba(0,0,0,0.3)';
+			    }
+			    
+			    // Category title (if exists)
+			    const categoryTitle = document.querySelector('.category-title');
+			    if (categoryTitle) {
+			        categoryTitle.style.color = '#fff';
+			    }
+			    
+			    // Products section
+			    document.querySelector('.products-container').style.backgroundColor = '#16213e';
+			    document.querySelector('.products-container').style.color = '#fff';
+			    document.querySelector('.product-heading').style.color = '#fff';
+			    
+			    // Style all product cards
+			    document.querySelectorAll('.product-card').forEach(card => {
+			        card.style.backgroundColor = '#293b5f';
+			        card.style.color = '#fff';
+			    });
+			    
+			    document.querySelectorAll('.product-title').forEach(title => {
+			        title.style.color = '#fff';
+			    });
+			    
+			    // Suggestions
+			    const suggestionsList = document.getElementById('suggestionsList');
+			    if (suggestionsList) {
+			        suggestionsList.style.backgroundColor = '#1e2a3a';
+			    }
+			    
+			    // Pagination
+			    document.querySelectorAll('.page-link').forEach(link => {
+			        link.style.backgroundColor = '#293b5f';
+			        link.style.color = '#fff';
+			    });
+			}
+
+			function disableDarkMode() {
+			    document.body.classList.remove('dark-mode');
+			    
+			    // Theme toggle button
+			    const themeToggle = document.getElementById('themeToggle');
+			    const moonIcon = themeToggle.querySelector('i');
+			    themeToggle.style.backgroundColor = '#fff';
+			    moonIcon.classList.replace('fa-sun', 'fa-moon');
+			    moonIcon.style.color = '';
+			    
+			    // Containers
+			    document.querySelector('.theme-container').style.backgroundColor = '';
+			    document.querySelector('.search-container').style.backgroundColor = 'rgb(7, 121, 248)';
+			    
+			    // Search input - Reset styling
+			    const searchInput = document.querySelector('.search-input');
+			    searchInput.style.backgroundColor = '';
+			    searchInput.style.color = '';
+			    searchInput.style.borderColor = '';
+			    searchInput.style.boxShadow = '';
+			    
+			    // Search button reset
+			    const searchBtn = document.querySelector('.search-btn');
+			    if (searchBtn) {
+			        searchBtn.style.backgroundColor = '#4361ee';
+			        searchBtn.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+			    }
+			    
+			    // Category title (if exists)
+			    const categoryTitle = document.querySelector('.category-title');
+			    if (categoryTitle) {
+			        categoryTitle.style.color = '';
+			    }
+			    
+			    // Products section
+			    document.querySelector('.products-container').style.backgroundColor = '';
+			    document.querySelector('.products-container').style.color = '';
+			    document.querySelector('.product-heading').style.color = '';
+			    
+			    // Reset all product cards
+			    document.querySelectorAll('.product-card').forEach(card => {
+			        card.style.backgroundColor = '';
+			        card.style.color = '';
+			    });
+			    
+			    document.querySelectorAll('.product-title').forEach(title => {
+			        title.style.color = '';
+			    });
+			    
+			    // Pagination
+			    document.querySelectorAll('.page-link').forEach(link => {
+			        link.style.backgroundColor = '';
+			        link.style.color = '';
+			    });
+			}
+        </script>
+    </section>
+</body>
+</html>

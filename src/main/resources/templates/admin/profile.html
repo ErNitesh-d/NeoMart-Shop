@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section},'Admin Profile')}">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Admin Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <section>
+        <div id="main-content" style="margin-left: 250px; transition: margin-left 0.3s ease;">
+            <div class="row" style="margin-top: 5%;">
+                <div class="col-md-10" style="margin-left: 9%;">
+                    <div style="background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.07); position: relative; overflow: hidden; animation: slideIn 0.8s ease forwards;">
+                        <!-- Background overlay effect -->
+                        <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, rgba(13,110,253,0.1), rgba(106,17,203,0.1)); transform: rotate(30deg); z-index: 1;"></div>
+                        
+                        <!-- Card Header -->
+                        <div style="background: transparent; border-bottom: 3px solid #0d6efd; text-align: center; padding-bottom: 20px; position: relative; z-index: 2;">
+                            <h2 style="font-size: 28px; color: #0d6efd; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 1px;">
+                                <i class="fas fa-user-cog" style="margin-right: 10px; text-align: center; margin-top: 15px;"></i>Admin Profile
+                            </h2>
+                            <th:block th:if="${session.succMsg}">
+                                <p style="color: #198754; font-weight: bold; margin-top: 10px; font-size: 16px; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 10px; box-shadow: 0 2px 10px rgba(25,135,84,0.2);">
+                                    <i class="fas fa-check-circle" style="margin-right: 8px;"></i>[[${session.succMsg}]]
+                                </p>
+                                <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                            </th:block>
+                            <th:block th:if="${session.errorMsg}">
+                                <p style="color: #dc3545; font-weight: bold; margin-top: 10px; font-size: 16px; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 10px; box-shadow: 0 2px 10px rgba(220,53,69,0.2);">
+                                    <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>[[${session.errorMsg}]]
+                                </p>
+                                <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                            </th:block>
+                        </div>
+                        
+                        <!-- Card Body -->
+                        <div style="position: relative; z-index: 2; padding: 20px;">
+                            <div class="text-center mb-4">
+                                <img alt="" th:src="@{'../img/profile_img/'+${user.profleImage}}" 
+                                    style="width: 110px; height: 110px; border-radius: 50%; border: 3px solid #6a11cb; box-shadow: 0 4px 15px rgba(106,17,203,0.3);">
+                            </div>
+                            
+                            <!-- Profile Form -->
+                            <form action="/admin/update-profile" method="post" enctype="multipart/form-data">
+                                <div class="row">
+                                    <!-- Name -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold" style="color: #495057;">Name</label>
+                                        <input type="text" name="name" class="form-control" th:value="${user.name}"
+                                            style="border-radius: 12px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); height: 50px; font-size: 14px;"
+                                            onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'">
+                                    </div>
+                                    <!-- Mobile Number -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold" style="color: #495057;">Mobile Number</label>
+                                        <input type="text" name="mobileNumber" class="form-control" th:value="${user.mobileNumber}"
+                                            style="border-radius: 12px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); height: 50px; font-size: 14px;"
+                                            onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'">
+                                    </div>
+                                    <!-- Email -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold" style="color: #495057;">Email</label>
+                                        <input type="text" class="form-control" th:value="${user.email}" readonly
+                                            style="border-radius: 12px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); height: 50px; font-size: 14px; background: #e9ecef;">
+                                    </div>
+                                    <!-- Address -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold" style="color: #495057;">Address</label>
+                                        <input type="text" name="address" class="form-control" th:value="${user.address}"
+                                            style="border-radius: 12px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); height: 50px; font-size: 14px;"
+                                            onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'">
+                                    </div>
+                                    <!-- City -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold" style="color: #495057;">City</label>
+                                        <input type="text" name="city" class="form-control" th:value="${user.city}"
+                                            style="border-radius: 12px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); height: 50px; font-size: 14px;"
+                                            onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'">
+                                    </div>
+                                    <!-- State -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold" style="color: #495057;">State</label>
+                                        <input type="text" name="state" class="form-control" th:value="${user.state}"
+                                            style="border-radius: 12px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); height: 50px; font-size: 14px;"
+                                            onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'">
+                                    </div>
+                                    <!-- Pincode -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold" style="color: #495057;">Pincode</label>
+                                        <input type="text" name="pincode" class="form-control" th:value="${user.pincode}"
+                                            style="border-radius: 12px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); height: 50px; font-size: 14px;"
+                                            onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'">
+                                    </div>
+                                    <!-- Profile Image Upload -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold" style="color: #495057;">Profile Image</label>
+                                        <input type="file" name="img" class="form-control"
+                                            style="border-radius: 12px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); height: 50px; font-size: 14px;"
+                                            onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'">
+                                    </div>
+                                    <!-- Role -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold" style="color: #495057;">Role</label>
+                                        <input type="text" class="form-control" th:value="${user.role}" readonly
+                                            style="border-radius: 12px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); height: 50px; font-size: 14px; background: #e9ecef;">
+                                    </div>
+                                    <!-- Account Status -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold" style="color: #495057;">Account Status</label>
+                                        <input type="text" class="form-control" th:value="${user.isEnabled}" readonly
+                                            style="border-radius: 12px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); height: 50px; font-size: 14px; background: #e9ecef;">
+                                    </div>
+                                </div>
+
+                                <!-- Hidden Input for User ID -->
+                                <input type="hidden" th:value="${user.id}" name="id">
+
+                                <!-- Update Button -->
+                                <div class="text-center mt-3">
+                                    <button class="btn btn-primary" 
+                                        style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); height: 50px; font-size: 14px; border: none; border-radius: 25px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; transition: all 0.4s ease; color: white; padding: 0 20px;" 
+                                        onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(106,17,203,0.4)'" 
+                                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                                        <i class="fas fa-save" style="margin-right: 8px;"></i>Update Profile
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- Change Password Section -->
+                            <div class="mt-5">
+                                <h3 style="font-size: 24px; color: #0d6efd; font-weight: bold; text-align: center; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #6a11cb; padding-bottom: 10px; margin-bottom: 20px;">
+                                    <i class="fas fa-lock" style="margin-right: 10px;"></i>Change Password
+                                </h3>
+                                <form action="/admin/change-password" method="post">
+                                    <div class="row justify-content-center">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold" style="color: #495057;">Current Password</label>
+                                                <input type="password" name="currentPassword" class="form-control"
+                                                    style="border-radius: 12px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); height: 50px; font-size: 14px;"
+                                                    onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold" style="color: #495057;">New Password</label>
+                                                <input type="password" name="newPassword" class="form-control"
+                                                    style="border-radius: 12px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); height: 50px; font-size: 14px;"
+                                                    onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold" style="color: #495057;">Confirm Password</label>
+                                                <input type="password" name="confirmPassword" class="form-control"
+                                                    style="border-radius: 12px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); height: 50px; font-size: 14px;"
+                                                    onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'">
+                                            </div>
+                                            <div class="text-center">
+                                                <button class="btn btn-primary" 
+                                                    style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); height: 50px; font-size: 14px; border: none; border-radius: 25px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; transition: all 0.4s ease; color: white; padding: 0 20px;" 
+                                                    onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(106,17,203,0.4)'" 
+                                                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                                                    <i class="fas fa-key" style="margin-right: 8px;"></i>Update
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Animation Keyframes -->
+        <script>
+            const styleSheet = document.createElement('style');
+            styleSheet.textContent = `
+                @keyframes slideIn {
+                    from { opacity: 0; transform: translateY(30px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `;
+            document.head.appendChild(styleSheet);
+        </script>
+    </section>
+</body>
+</html>

@@ -1,0 +1,758 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+   th:fragment="layout(content, title)">
+<head>
+    <meta charset="ISO-8859-1">
+  <title th:text="${title}">Base Layout</title>
+	
+	<style>
+		  .footer-container, .footer, .footer-columns {
+			    max-width: 100%;
+			    overflow: hidden;
+				margin-top: 0%;
+			  }
+			  html, body {
+			    overflow-x: hidden;
+			    width: 100vw; /* Force viewport width */
+			    margin: 0;
+			    padding: 0;	
+			  }
+			  section #main-content {
+			      background-color: white !important;
+			      padding: 20px;
+			      border-radius: 8px;
+			    }
+	</style>
+	 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+	  rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+	  crossorigin="anonymous">
+	  
+	  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" 
+	  integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" 
+	  crossorigin="anonymous" referrerpolicy="no-referrer" />	
+	 
+	   <link rel="stylesheet" href="/css/style.css">
+</head>
+<body >
+	
+	<!--START NAVABAR-->
+
+	<th:block th:if="${user==null or user.role == 'ROLE_USER'}">
+	<nav class="navbar navbar-expand-lg bg-primary fixed-top navbar-dark">
+	  <div class="container-fluid">
+	   <img th:src="@{/img/logo-transparent.png}" class="d-block " alt="..." height="55px" width="150px"></a>
+	    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+	      <span class="navbar-toggler-icon"></span>
+	    </button>
+		
+	    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+	      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+			
+			<th:block th:if="${user == null or user.role == 'ROLE_USER'}">
+			    <li class="nav-item">
+			        <a class="nav-link active user-nav-link" aria-current="page" href="/"><i class="fa-solid fa-house"></i> Home</a>
+			    </li>
+			</th:block>
+
+			<th:block th:unless="${user==null}">
+				<li class="nav-item" th:if="${user.role=='ROLE_ADMIN'}">
+			      <a class="nav-link active" aria-current="page" href="/admin/"><i class="fa-solid fa-house"></i> Home</a>
+			    </li>	
+				
+			</th:block>
+
+			
+			<li class="nav-item">
+			<a class="nav-link active user-nav-link" aria-current="page" href="/products">Product</a>
+			</li>
+	        
+			<li class="nav-item dropdown">
+	          <a class="nav-link dropdown-toggle user-nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+	            Category
+	          </a>
+	          <ul class="dropdown-menu">
+	            <li th:each="c:${categorys}"><a class="dropdown-item user-dropdown-item" th:href="@{'/products?category='+${c.name}}">[[${c.name}]]</a></li>
+	            
+	          </ul>
+	        </li>
+	       
+	      </ul>
+	      
+		  <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+			<th:block th:if="${user==null}">
+		  	        <li class="nav-item">
+		  	          <a class="nav-link active user-nav-link" aria-current="page" href="/signin"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+		  	        </li>
+		  			<li class="nav-item">
+		  			<a class="nav-link active user-nav-link" aria-current="page" href="/register">Register</a>
+		  			</li>
+					
+			</th:block>
+		  	      </li> 
+				  
+				  <th:block th:if="${user!=null}">
+				      <li class="nav-item dropdown">
+				          <a class="nav-link dropdown-toggle active user-dropdown user-nav-link" 
+				             href="#" 
+				             role="button" 
+				             data-bs-toggle="dropdown" 
+				             aria-expanded="false">
+							 <img alt="" th:src="@{'/img/profile_img/'+${user.profleImage}}" width="40px" height="40x" style="border-radius: 50%; object-fit: cover;">
+							 [[${user.name}]]
+
+				          </a>
+				          <ul class="dropdown-menu">
+				              <li th:if="${user.role=='ROLE_USER'}">
+				                  <a class="dropdown-item user-dropdown-item" th:href="@{/user/profile}">
+				                      <i class="fa-solid fa-user"></i> Profile
+				                  </a>
+				              </li>
+				              <li th:if="${user.role=='ROLE_USER'}">
+				                  <a class="dropdown-item user-dropdown-item" th:href="@{/user/user-orders}">
+				                      <i class="fa-solid fa-box"></i> My Orders
+				                  </a>
+				              </li>
+				              <li th:if="${user.role=='ROLE_USER'}">
+				                  <a class="dropdown-item user-dropdown-item" th:href="@{/user/wishlist/{id}(id=${user.id})}">
+				                      <i class="fa-solid fa-heart text-danger"></i> Wishlist <span class="badge bg-success">[[${countWishlist}]]</span>
+				                  </a>
+				              </li>
+				              <li th:if="${user.role=='ROLE_USER'}">
+				                  <a class="dropdown-item user-dropdown-item" th:href="@{/user/cart}">
+				                      <i class="fa-solid fa-cart-shopping"></i> Cart <span class="badge bg-success">[[${countCart}]]</span>
+				                  </a>
+				              </li>
+				              <li><hr class="dropdown-divider"></li>
+				              <li>
+				                  <a class="dropdown-item user-dropdown-item" th:href="@{/logout}">
+				                      <i class="fa-solid fa-right-to-bracket"></i> Logout
+				                  </a>
+				              </li>
+							  
+				          </ul>
+				      </li>
+				  </th:block>
+		  </ul>
+	    </div>
+	  </div>
+	</nav>	
+	</th:block>
+
+	<style>
+	/* Custom CSS to increase font size for user navigation elements */
+	.user-nav-link {
+	  font-size: 1.5rem !important; /* Increase font size for main navigation links */
+	  font-weight:700;
+	}
+
+	.user-dropdown-item {
+	  font-size: 1.5rem !important; /* Increase font size for dropdown items */
+	  font-weight:700;
+	}
+	</style>
+	
+	<th:block th:if="${user!=null and user.role == 'ROLE_ADMIN'}">
+	
+	
+	<nav style="position: fixed;  top: 0;      width: 100%;          z-index: 1000; background: linear-gradient(to right, #4361ee, #3f37c9); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); height: 50px; padding: 0 20px;" class="navbar navbar-expand-lg navbar-dark">
+	        <div class="container-fluid">
+					          <a class="navbar-brand" href="/admin/" style="font-weight: 700; letter-spacing: 1px; font-size: 22px;">
+	                <i class="fas fa-house me-2"></i>Home
+	            </a>
+				<a class="navbar-brand" href="/admin/products" style="font-weight: 700; letter-spacing: 1px; font-size: 22px;">
+				      <i class="fa-solid fa-cart-plus"></i> Product
+				  </a>
+				  <ul class="navbar-nav me-auto mb-2 mb-lg-0"> 
+						  <li class="nav-item dropdown">
+						 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-weight: 700; letter-spacing: 1px; font-size: 22px;">
+						     <i class="fa-solid fa-list"></i> Category
+						 </a>
+						 <ul class="dropdown-menu">
+						 	  <li th:each="c:${categorys}"><a class="dropdown-item" th:href="@{'/admin/loadEditCategory/'}+ ${c.id}">[[${c.name}]]</a></li>
+						</ul>
+					</li>
+				 </ul>
+					            
+				 	         
+	            <div class="ms-auto d-flex align-items-center">
+	                <div id="currentTime" style="font-size: 12px; color: #fff; margin-right: 15px;">00:00:00</div>
+					<script>
+					    function updateTime() {
+					        const timeElement = document.getElementById("currentTime");
+					        if (timeElement) {
+					            timeElement.innerText = new Date().toLocaleTimeString();
+					        }
+					    }
+					    setInterval(updateTime, 1000);
+					    updateTime(); // Initial call to show time immediately
+					</script>
+
+					<div class="dropdown me-3">
+					    <div style="position: relative; cursor: pointer;" role="button" data-bs-toggle="dropdown">
+					        <i class="fas fa-calendar text-white fa-lg"></i>
+					    </div>
+	
+					    <!-- Dropdown Menu (Calendar) -->
+					    <ul class="dropdown-menu dropdown-menu-end" 
+					        style="border: none; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 10px; padding: 10px; width: 400px;">
+					        <li><h6 class="dropdown-header">Calendar</h6></li>
+					        <li>
+					            <!-- Embedded Calendar -->
+					            <iframe src="https://calendar.google.com/calendar/embed?mode=MONTH"
+					                    style="border: none; width: 100%; height: 250px;">
+					            </iframe>
+					        </li>
+					    
+					    </ul>
+					</div>
+
+
+	                <div class="dropdown me-3">
+	                    <div style="display: flex; align-items: center;" role="button" data-bs-toggle="dropdown">
+	                        <img th:src="@{'/img/profile_img/'+${user.profleImage}}" alt="Avatar" style="width: 36px; height: 36px; border-radius: 50%; margin-right: 10px; border: 2px solid white;">
+	                        <span class="text-white d-none d-md-inline-block"> [[${user.name}]] <i class="fa-solid fa-caret-down"></i></span>
+	                    </div>
+	                    <ul class="dropdown-menu dropdown-menu-end" style="border: none; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 10px;">
+	                         <li><a class="dropdown-item" href="/admin/profile"><i class="fas fa-user	 me-2"></i>Profile</a></li>
+							<!-- <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>-->
+	                        <li><hr class="dropdown-divider"></li>
+	                        <li><a class="dropdown-item" th:href="@{/logout}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+	                    </ul>
+	                </div>	
+				
+
+	            </div>
+	        </div>
+    </nav>
+	
+<div style="background: linear-gradient(to bottom, #4361ee, #3f37c9);">
+	
+		<div id="sidebar" style="height: 100%;  margin-top: 500%;  position: fixed; margin-top: 50px;margin-bottom: 50%; flex-direction: 
+		column; background: linear-gradient(to bottom, #4361ee, #3f37c9); color: white; padding: 20px;
+		 width: 250px; box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1); overflow-y: auto; transition: width 0.3s ease; resize: horizontal;">
+		    <!-- Add a resize handle that users can drag -->
+		    <div class="resize-handle" style="position: absolute; right: 0; top: 0; bottom: 0; width: 5px; cursor: ew-resize; background-color: rgba(255, 255, 255, 0.1);"></div>
+		    
+		    <div style="text-align: center; margin-bottom: 20px;">
+		        <img th:src="@{/img/newlogo.png}" alt="Logo" style="width: 140px; height: 40px; border-radius: 10px; margin-bottom: 10px;">
+		        <h4 style="margin-bottom: 0;">Admin Dashboard</h4>
+		    </div>
+
+		    <div style="margin-bottom: 20px;">
+		        <div style="display: flex; align-items: center;">
+		            <div style="width: 10px; height: 10px; background-color: #2ecc71; border-radius: 50%; margin-right: 5px; animation: blink 1.5s infinite;"></div>
+		            <small>Live Data</small>
+		        </div>
+		    </div>
+		    
+		    <div style="margin-bottom: 50px;">
+				<ul class="nav flex-column" style="flex-grow: 1; padding-bottom: 10px;">
+					<li class="nav-item">
+					    <a class="nav-link text-white" href="/admin/" style="display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; margin-bottom: 3px; transition: all 0.3s ease; text-decoration: none; color: #fff; background-color: transparent;" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="if(!this.classList.contains('active')) this.style.backgroundColor='transparent'">
+					        <i class="fas fa-home" style="margin-right: 10px; width: 20px; text-align: center;"></i>Dashboard
+					    </a>
+					</li>
+				    <li class="nav-item">
+				        <a class="sidebar-link text-white" href="/admin/loadAddProduct" style="display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; margin-bottom: 8px; transition: all 0.3s ease; text-decoration: none; color: #fff; background-color: transparent;" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="if(!this.classList.contains('active')) this.style.backgroundColor='transparent'">
+				            <i class="fas fa-box" style="margin-right: 10px; width: 20px; text-align: center;"></i>Add Products
+				        </a>
+				    </li>
+				    <li class="nav-item">
+				        <a class="sidebar-link text-white" href="/admin/products" style="display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; margin-bottom: 8px; transition: all 0.3s ease; text-decoration: none; color: #fff; background-color: transparent;" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="if(!this.classList.contains('active')) this.style.backgroundColor='transparent'">
+				            <i class="fas fa-shopping-cart" style="margin-right: 10px; width: 20px; text-align: center;"></i>View Products
+				        </a>
+				    </li>
+				    <li class="nav-item">
+				        <a class="sidebar-link text-white" href="/admin/users?type=1" style="display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; margin-bottom: 8px; transition: all 0.3s ease; text-decoration: none; color: #fff; background-color: transparent;" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="if(!this.classList.contains('active')) this.style.backgroundColor='transparent'">
+				            <i class="fas fa-users" style="margin-right: 10px; width: 20px; text-align: center;"></i>Customers
+				        </a>
+				    </li>
+				    <li class="nav-item">
+				        <a class="sidebar-link text-white" href="/admin/category" style="display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; margin-bottom: 8px; transition: all 0.3s ease; text-decoration: none; color: #fff; background-color: transparent;" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="if(!this.classList.contains('active')) this.style.backgroundColor='transparent'">
+				            <i class="fas fa-chart-line" style="margin-right: 10px; width: 20px; text-align: center;"></i>Add Category
+				        </a>
+				    </li>
+				    <li class="nav-item">
+				        <a class="sidebar-link text-white" href="/admin/orders" style="display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; margin-bottom: 8px; transition: all 0.3s ease; text-decoration: none; color: #fff; background-color: transparent;" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="if(!this.classList.contains('active')) this.style.backgroundColor='transparent'">
+				            <i class="fas fa-cog" style="margin-right: 10px; width: 20px; text-align: center;"></i>Orders
+				        </a>
+				    </li>
+				    <li class="nav-item">
+				        <a class="sidebar-link text-white" href="/admin/add-admin" style="display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; margin-bottom: 8px; transition: all 0.3s ease; text-decoration: none; color: #fff; background-color: transparent;" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="if(!this.classList.contains('active')) this.style.backgroundColor='transparent'">
+				            <i class="fas fa-user-plus" style="margin-right: 10px; width: 20px; text-align: center;"></i>Add Admin
+				        </a>
+				    </li>
+				    <li class="nav-item">
+				        <a class="sidebar-link text-white" href="/admin/users?type=2" style="display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; margin-bottom: 8px; transition: all 0.3s ease; text-decoration: none; color: #fff; background-color: transparent;" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="if(!this.classList.contains('active')) this.style.backgroundColor='transparent'">
+				            <i class="fas fa-user-shield" style="margin-right: 10px; width: 20px; text-align: center;"></i>Admin
+				        </a>
+				    </li>
+				    <li class="nav-item">
+				        <a class="sidebar-link text-white" href="/admin/coupons" style="display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; margin-bottom: 8px; transition: all 0.3s ease; text-decoration: none; color: #fff; background-color: transparent;" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="if(!this.classList.contains('active')) this.style.backgroundColor='transparent'">
+				            <i class="fas fa-ticket-alt" style="margin-right: 10px; width: 20px; text-align: center;"></i>Add Coupons
+				        </a>
+				    </li>
+				</ul>
+
+				<script>
+				document.addEventListener('DOMContentLoaded', function() {
+				    const navLinks = document.querySelectorAll('.sidebar-link');
+					let isActiveSet = false;
+				    // Set active state based on current URL
+				    const currentPath = window.location.pathname + window.location.search;
+				    navLinks.forEach(link => {
+				        const linkPath = new URL(link.href).pathname + new URL(link.href).search;
+				        if (linkPath === currentPath) {
+				            link.classList.add('active');
+				            link.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+				        }
+				    });
+
+				    // Handle click events
+				    navLinks.forEach(link => {
+				        link.addEventListener('click', function() {
+				            navLinks.forEach(l => {
+				                l.classList.remove('active');
+				                l.style.backgroundColor = 'transparent';
+				            });
+				            this.classList.add('active');
+				            this.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+				        });
+				    });
+				});
+				</script>
+		        <div class="support-section">
+		            <h6>Need help?</h6>
+		            <p style="font-size: 12px;">Contact support for assistance</p>
+		            <button class="btn btn-sm btn-light">Contact</button>
+		        </div>
+		    </div>
+		</div>
+
+		<!-- Add JavaScript for custom resize functionality -->
+		<script>
+		document.addEventListener('DOMContentLoaded', function() {
+		    const sidebar = document.getElementById('sidebar');
+		    const resizeHandle = document.querySelector('.resize-handle');
+		    let isResizing = false;
+		    
+		    // Set minimum and maximum width constraints
+		    const minWidth = 180;
+		    const maxWidth = 400;
+		    
+		    // Mouse down event on the resize handle
+		    resizeHandle.addEventListener('mousedown', function(e) {
+		        isResizing = true;
+		        document.body.style.cursor = 'ew-resize';
+		        document.body.style.userSelect = 'none'; // Prevent text selection during resize
+		        e.preventDefault();
+		    });
+		    
+		    // Mouse move event for resizing
+		    document.addEventListener('mousemove', function(e) {
+		        if (!isResizing) return;
+		        
+		        // Calculate new width based on mouse position
+		        let newWidth = e.clientX;
+		        
+		        // Apply constraints
+		        if (newWidth < minWidth) newWidth = minWidth;
+		        if (newWidth > maxWidth) newWidth = maxWidth;
+		        
+		        // Apply the new width
+		        sidebar.style.width = newWidth + 'px';
+		    });
+		    
+		    // Mouse up event to stop resizing
+		    document.addEventListener('mouseup', function() {
+		        if (isResizing) {
+		            isResizing = false;
+		            document.body.style.cursor = '';
+		            document.body.style.userSelect = '';
+		        }
+		    });
+		    
+		    // Add touch support for mobile devices
+		    resizeHandle.addEventListener('touchstart', function(e) {
+		        isResizing = true;
+		        document.body.style.userSelect = 'none';
+		        e.preventDefault();
+		    });
+		    
+		    document.addEventListener('touchmove', function(e) {
+		        if (!isResizing) return;
+		        
+		        const touch = e.touches[0];
+		        let newWidth = touch.clientX;
+		        
+		        if (newWidth < minWidth) newWidth = minWidth;
+		        if (newWidth > maxWidth) newWidth = maxWidth;
+		        
+		        sidebar.style.width = newWidth + 'px';
+		    });
+		    
+		    document.addEventListener('touchend', function() {
+		        if (isResizing) {
+		            isResizing = false;
+		            document.body.style.userSelect = '';
+		        }
+		    });
+		});
+		</script>
+
+		<script>
+		document.addEventListener('DOMContentLoaded', function() {
+		    const sidebar = document.getElementById('sidebar');
+		    const mainContent = document.getElementById('main-content');
+			mainContent.style.backgroundColor='white';
+		    const toggleButton = document.getElementById('toggle-sidebar');
+		    let isSidebarVisible = true;
+
+		    toggleButton.addEventListener('click', function() {
+		        if (isSidebarVisible) {
+		            sidebar.style.width = '0';
+		            mainContent.style.marginLeft = '0';
+		        } else {
+		            sidebar.style.width = '250px';
+		            mainContent.style.marginLeft = '250px';
+		        }
+		        isSidebarVisible = !isSidebarVisible;
+		    });
+		});
+		</script>	
+		<script>
+		document.addEventListener('DOMContentLoaded', function() {
+		    const sidebar = document.getElementById('sidebar');
+		    const mainContent = document.getElementById('main-content');
+		
+		    const resizeHandle = document.querySelector('.resize-handle');
+		    let isResizing = false;
+		    
+		    // Set minimum and maximum width constraints
+		    const minWidth = 180;
+		    const maxWidth = 400;
+		    
+		    // Initialize the main content margin to match sidebar width
+		    mainContent.style.marginLeft = sidebar.offsetWidth + 'px';
+		    
+		    // Function to update main content margin
+		    function updateMainContentMargin() {
+		        mainContent.style.marginLeft = sidebar.offsetWidth + 'px';
+		    }
+		    
+		    // Mouse down event on the resize handle
+		    resizeHandle.addEventListener('mousedown', function(e) {
+		        isResizing = true;
+		        document.body.style.cursor = 'ew-resize';
+		        document.body.style.userSelect = 'none'; // Prevent text selection during resize
+		        e.preventDefault();
+		    });
+		    
+		    // Mouse move event for resizing
+		    document.addEventListener('mousemove', function(e) {
+		        if (!isResizing) return;
+		        
+		        // Calculate new width based on mouse position
+		        let newWidth = e.clientX;
+		        
+		        // Apply constraints
+		        if (newWidth < minWidth) newWidth = minWidth;
+		        if (newWidth > maxWidth) newWidth = maxWidth;
+		        
+		        // Apply the new width to sidebar
+		        sidebar.style.width = newWidth + 'px';
+		        
+		        // Update main content margin
+		        updateMainContentMargin();
+		    });
+		    
+		    // Mouse up event to stop resizing
+		    document.addEventListener('mouseup', function() {
+		        if (isResizing) {
+		            isResizing = false;
+		            document.body.style.cursor = '';
+		            document.body.style.userSelect = '';
+		        }
+		    });
+		    
+		    // Add touch support for mobile devices
+		    resizeHandle.addEventListener('touchstart', function(e) {
+		        isResizing = true;
+		        document.body.style.userSelect = 'none';
+		        e.preventDefault();
+		    });
+		    
+		    document.addEventListener('touchmove', function(e) {
+		        if (!isResizing) return;
+		        
+		        const touch = e.touches[0];
+		        let newWidth = touch.clientX;
+		        
+		        if (newWidth < minWidth) newWidth = minWidth;
+		        if (newWidth > maxWidth) newWidth = maxWidth;
+		        
+		        sidebar.style.width = newWidth + 'px';
+		        updateMainContentMargin();
+		    });
+		    
+		    document.addEventListener('touchend', function() {
+		        if (isResizing) {
+		            isResizing = false;
+		            document.body.style.userSelect = '';
+		        }
+		    });
+		    
+		    // Handle window resize events
+		    window.addEventListener('resize', function() {
+		        // Make sure the sidebar doesn't exceed max width on window resize
+		        const currentWidth = sidebar.offsetWidth;
+		        if (currentWidth > maxWidth) {
+		            sidebar.style.width = maxWidth + 'px';
+		            updateMainContentMargin();
+		        }
+		    });
+		    
+		    // Add a mutation observer to detect any changes to the sidebar width
+		    // (helpful for when CSS transitions or other scripts might change the width)
+		    const observer = new MutationObserver(function(mutations) {
+		        mutations.forEach(function(mutation) {
+		            if (mutation.attributeName === 'style') {
+		                updateMainContentMargin();
+		            }
+		        });
+		    });
+		    
+		    observer.observe(sidebar, { attributes: true });
+		});
+		</script>
+
+		<!-- Add animation for the blinking live data indicator -->
+		<style>
+		@keyframes blink {
+		    0% { opacity: 0.4; }
+		    50% { opacity: 1; }
+		    100% { opacity: 0.4; }
+		}
+		</style>
+
+		</th:block>
+	<!--END NAVBAR-->
+	<div th:replace="${content}"></div>
+
+	<th:block th:if="${user == null or (user != null and user.role == 'ROLE_USER')}">
+		
+	<footer class="footer" style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); background-size: 200% 200%;
+	 color: white; padding: 21.6px 0; border-radius: 5px 5px 0 0; box-shadow: 0 -3px 10px rgba(0,0,0,0.1);
+	  margin-top: 0px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; width: 100vw; animation: gradientShift 15s ease infinite;">
+	  
+	    <div class="footer-container" style="width: 100%; padding: 0 20px; max-width: 1200px; margin: 0 auto;">
+	        <!-- Three-Column Layout -->
+	        <div class="footer-main" style="display: flex; flex-wrap: wrap; justify-content: space-between; margin-bottom: 27px;">
+	            <!-- Company Info -->
+	            <div class="footer-col" style="flex: 1; min-width: 250px; margin-bottom: 18px; animation: fadeIn 0.8s ease-in-out;">
+	                <h3 style="font-size: 18px;  font-weight: 700; position: relative; display: inline-block;">
+	                    THE NEOMART
+	                    <span class="highlight" style="position: absolute; width: 0; height: 2px; bottom: -2px; left: 0; background-color: white; animation: expandWidth 3s ease-in-out infinite;"></span>
+	                </h3>
+	                <p style="margin: 0 0 13.5px 0; font-size: 13px; color: rgba(255,255,255,0.9);">Your one-stop shopping destination</p>
+	                
+	                <!-- Social Media Icons -->
+	                <div style="display: flex; gap: 12px; margin-top: 2;">
+	                    <a href="#" class="social-icon" style="width: 32px; height: 32px; background-color: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; transition: all 0.3s; position: relative; overflow: hidden;" onmouseover="this.querySelector('.ripple').style.transform='scale(1.5)'; this.style.backgroundColor='#4267B2'" onmouseout="this.querySelector('.ripple').style.transform='scale(0)'; this.style.backgroundColor='rgba(255,255,255,0.1)'">
+	                        <span class="ripple" style="position: absolute; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); transform: scale(0); transition: transform 0.5s;"></span>
+	                        <i class="fa-brands fa-facebook"></i>
+	                    </a>
+	                    <a href="#" class="social-icon" style="width: 32px; height: 32px; background-color: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; transition: all 0.3s; position: relative; overflow: hidden;" onmouseover="this.querySelector('.ripple').style.transform='scale(1.5)'; this.style.backgroundColor='#1DA1F2'" onmouseout="this.querySelector('.ripple').style.transform='scale(0)'; this.style.backgroundColor='rgba(255,255,255,0.1)'">
+	                        <span class="ripple" style="position: absolute; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); transform: scale(0); transition: transform 0.5s;"></span>
+	                        <i class="fa-brands fa-square-x-twitter"></i>
+	                    </a>
+	                    <a href="#" class="social-icon" style="width: 32px; height: 32px; background-color: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; transition: all 0.3s; position: relative; overflow: hidden;" onmouseover="this.querySelector('.ripple').style.transform='scale(1.5)'; this.style.backgroundColor='#E1306C'" onmouseout="this.querySelector('.ripple').style.transform='scale(0)'; this.style.backgroundColor='rgba(255,255,255,0.1)'">
+	                        <span class="ripple" style="position: absolute; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); transform: scale(0); transition: transform 0.5s;"></span>
+	                        <i class="fa-brands fa-instagram"></i>
+	                    </a>
+	                    <a href="#" class="social-icon" style="width: 32px; height: 32px; background-color: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; transition: all 0.3s; position: relative; overflow: hidden;" onmouseover="this.querySelector('.ripple').style.transform='scale(1.5)'; this.style.backgroundColor='#0077B5'" onmouseout="this.querySelector('.ripple').style.transform='scale(0)'; this.style.backgroundColor='rgba(255,255,255,0.1)'">
+	                        <span class="ripple" style="position: absolute; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); transform: scale(0); transition: transform 0.5s;"></span>
+	                        <i class="fa-brands fa-linkedin"></i>
+	                    </a>
+	                </div>
+	            </div>
+	            
+	            <!-- Quick Links -->
+	            <div class="footer-col" style="flex: 1; min-width: 250px; margin-bottom: 18px; animation: fadeIn 1s ease-in-out;">
+	                <h4 style="font-size: 14.4px; margin: 0 0 13.5px 0; font-weight: 600; position: relative; display: inline-block;">
+	                    Quick Links
+	                    <span class="highlight" style="position: absolute; width: 0; height: 1px; bottom: -2px; left: 0; background-color: rgba(255,255,255,0.5); animation: expandWidth 3s ease-in-out infinite; animation-delay: 0.5s;"></span>
+	                </h4>
+	                <ul style="list-style: none; padding: 0; margin: 0;">
+	                    <li style="margin-bottom: 2px;">
+	                        <a href="/products" class="footer-link" style="color: white; text-decoration: none; transition: all 0.3s; position: relative; display: inline-block;" onmouseover="this.querySelector('.link-highlight').style.width='100%'" onmouseout="this.querySelector('.link-highlight').style.width='0'">
+	                            Our Products
+	                            <span class="link-highlight" style="position: absolute; width: 0; height: 1px; bottom: 0; left: 0; background-color: white; transition: width 0.3s;"></span>
+	                        </a>
+	                    </li>
+	                    <li style="margin-bottom:2px;">
+	                        <a href="/about-neomart" class="footer-link" style="color: white; text-decoration: none; transition: all 0.3s; position: relative; display: inline-block;" onmouseover="this.querySelector('.link-highlight').style.width='100%'" onmouseout="this.querySelector('.link-highlight').style.width='0'">
+	                            About Us
+	                            <span class="link-highlight" style="position: absolute; width: 0; height: 1px; bottom: 0; left: 0; background-color: white; transition: width 0.3s;"></span>
+	                        </a>
+	                    </li>
+	                    <li style="margin-bottom: 2px;">
+	                        <a href="/terms&conditions" class="footer-link" style="color: white; text-decoration: none; transition: all 0.3s; position: relative; display: inline-block;" onmouseover="this.querySelector('.link-highlight').style.width='100%'" onmouseout="this.querySelector('.link-highlight').style.width='0'">
+	                            Terms & Conditions
+	                            <span class="link-highlight" style="position: absolute; width: 0; height: 1px; bottom: 0; left: 0; background-color: white; transition: width 0.3s;"></span>
+	                        </a>
+	                    </li>
+	                    <li style="margin-bottom: 2px;">
+	                        <a href="/privacy-policy" class="footer-link" style="color: white; text-decoration: none; transition: all 0.3s; position: relative; display: inline-block;" onmouseover="this.querySelector('.link-highlight').style.width='100%'" onmouseout="this.querySelector('.link-highlight').style.width='0'">
+	                            Privacy Policy
+	                            <span class="link-highlight" style="position: absolute; width: 0; height: 1px; bottom: 0; left: 0; background-color: white; transition: width 0.3s;"></span>
+	                        </a>
+	                    </li>
+	                </ul>
+	            </div>
+	            
+	            <!-- Contact Info -->
+	            <div class="footer-col" style="flex: 1; min-width: 250px; margin-bottom: 18px; animation: fadeIn 1.2s ease-in-out;">
+	                <h4 style="font-size: 14.4px; margin: 0 0 13.5px 0; font-weight: 600; position: relative; display: inline-block;">
+	                    Contact Us
+	                    <span class="highlight" style="position: absolute; width: 0; height: 1px; bottom: -2px; left: 0; background-color: rgba(255,255,255,0.5); animation: expandWidth 3s ease-in-out infinite; animation-delay: 1s;"></span>
+	                </h4>
+	                <div class="contact-item" style="display: flex; align-items: center; margin-bottom: 2px;">
+	                    <div class="icon" style="width: 18px; height: 18px; margin-right: 9px; display: flex; align-items: center; justify-content: center; background-color: rgba(255,255,255,0.1); border-radius: 50%; padding: 3px;">
+	                        <i class="fa-solid fa-envelope" style="font-size: 11px;"></i>
+	                    </div>
+	                    <p style="margin: 0; font-size: 13px; color: rgba(255,255,255,0.9);">support@theneomart.com</p>
+	                </div>
+	                <div class="contact-item" style="display: flex; align-items: center; margin-bottom:2px;">
+	                    <div class="icon" style="width: 18px; height: 18px; margin-right: 9px; display: flex; align-items: center; justify-content: center; background-color: rgba(255,255,255,0.1); border-radius: 50%; padding: 3px;">
+	                        <i class="fa-solid fa-phone" style="font-size: 11px;"></i>
+	                    </div>
+	                    <p style="margin: 0; font-size: 13px; color: rgba(255,255,255,0.9);">(7043) 376 520</p>
+	                </div>
+	                <div class="contact-item" style="display: flex; align-items: flex-start; margin-bottom: 2px;">
+	                    <div class="icon" style="width: 18px; height: 18px; margin-right: 9px; display: flex; align-items: center; justify-content: center; background-color: rgba(255,255,255,0.1); border-radius: 50%; padding: 3px; margin-top: 2.7px;">
+	                        <i class="fa-solid fa-location-dot" style="font-size: 11px;"></i>
+	                    </div>
+	                    <p style="margin: 0; font-size: 13px; color: rgba(255,255,255,0.9); line-height: 1.35;">123 Commerce Street, Jetpur-360370, Rajkot.</p>
+	                </div>
+	            </div>
+	        </div>
+	        
+	        <!-- Animated Divider -->
+	        <div class="divider" style="height: 1px; background: linear-gradient(to right, rgba(255,255,255,0.05), rgba(255,255,255,0.5), rgba(255,255,255,0.05)); position: relative; overflow: hidden; ">
+	          <div class="divider-animation" style="position: absolute; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,0.8), rgba(255,255,255,0)); transform: translateX(-100%); animation: slideDivider 4s ease-in-out infinite;"></div>
+	        </div>
+
+	        <!-- Copyright Section -->
+	        <div class="footer-bottom" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;">
+	          <p style="margin: 4.5px 0; font-size: 13px; color: rgba(255,255,255,0.9); line-height: 1.35;">
+	            <span style="font-weight: 600;">NEOMART SHOPPING HUB</span> &copy; 2025 ECOMMERCE CORPORATION OF INDIA
+	          </p>
+	          <p style="margin: 4.5px 0; font-size: 13px; color: rgba(255,255,255,0.9); line-height: 1.35;">
+	            <a href="https://neomart.com" class="website-link" style="color: white; text-decoration: none; font-weight: 500; position: relative; display: inline-block;" onmouseover="this.querySelector('.link-highlight').style.width='100%'" onmouseout="this.querySelector('.link-highlight').style.width='0'">
+	              neomart.com
+	              <span class="link-highlight" style="position: absolute; width: 0; height: 1px; bottom: 0; left: 0; background-color: white; transition: width 0.3s;"></span>
+	            </a>
+	          </p>
+	        </div>
+	    </div>
+
+	    <!-- Add keyframe animations -->
+	    <style>
+	        @keyframes gradientShift {
+	            0% { background-position: 0% 50%; }
+	            50% { background-position: 100% 50%; }
+	            100% { background-position: 0% 50%; }
+	        }
+	        
+	        @keyframes fadeIn {
+	            from { opacity: 0; transform: translateY(9px); }
+	            to { opacity: 1; transform: translateY(0); }
+	        }
+	        
+	        @keyframes expandWidth {
+	            0% { width: 0; }
+	            50% { width: 100%; }
+	            100% { width: 0; }
+	        }
+	        
+	        @keyframes slideDivider {
+	            0% { transform: translateX(-100%); }
+	            100% { transform: translateX(200%); }
+	        }
+	        
+	        .social-icon:hover {
+	            transform: translateY(-2.7px);
+	        }
+	        
+	        /* Make the footer responsive */
+	        @media (max-width: 600px) {
+	            .footer-main {
+	                flex-direction: column;
+	            }
+	            .footer-col {
+	                width: 100%;
+	            }
+	            .footer-bottom {
+	                flex-direction: column;
+	                text-align: center;
+	            }
+	        }
+	    </style>
+	</footer>
+   <!--END FOOTER-->
+   </th:block>
+   
+   <th:block th:if="${user!=null and user.role == 'ROLE_ADMIN'}">
+   <!--Start Admin Footer-->
+   <div class="container-fluid p-3 bg-primary text-center text-white" style="margin: 0;">
+     <div style="display: flex; justify-content: center; gap: 20px; padding-bottom: 10px;">
+       <a href="/admin/" style="color: white; text-decoration: none;">Dashboard</a>
+       <a href="/admin/users?type=1" style="color: white; text-decoration: none;">Users</a>
+       <a href="/admin/orders" style="color: white; text-decoration: none;">Sales</a>
+       <a href="/admin/products" style="color: white; text-decoration: none;">Products</a>
+       <a th:href="@{/logout}" style="color: white; text-decoration: none;">Logout</a>
+     </div>
+
+     <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 10px;">
+       <a href="#" style="color: white;"><i class="fa-brands fa-x-twitter fa-lg"></i></a>
+       <a href="#" style="color: white;"><i class="fa-brands fa-facebook fa-lg"></i></a>
+       <a href="#" style="color: white;"><i class="fa-brands fa-instagram fa-lg"></i></a>
+       <a href="#" style="color: white;"><i class="fa-brands fa-linkedin fa-lg"></i></a>
+     </div>
+
+     <div style="text-align: center; margin-bottom: 5px; font-size: 14px;">
+       <span>Email: support@theneomart.com | Phone: (7043) 376 520</span>
+     </div>
+
+     <div style="text-align: center;">
+       <span style="font-weight: 600;">NEOMART SHOPPING HUB</span> &copy; 2025 ECOMMERCE CORPORATION OF INDIA | All Rights Reserved
+     </div>
+
+     <div style="text-align: center; margin-top: 5px; font-size: 14px;">
+       <a href="https://neomart.com" style="color: white; text-decoration: none; font-weight: 500;">neomart.com</a>
+     </div>
+   </div>
+
+   <!--End Admin Footer-->
+   
+   </th:block>
+   <!-- Jquery Validation Library  -->
+   	<script
+   		src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+   	<script
+   		src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
+   	<script type="text/javascript" src="js/script.js"></script>
+   	<script type="text/javascript" src="../js/script.js"></script>
+   	
+	<!-- End  -->
+   
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
+	integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
+	crossorigin="anonymous"></script>
+	<script src="https://kit.fontawesome.com/your-font-awesome-kit.js" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+	 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+</body>
+</html>

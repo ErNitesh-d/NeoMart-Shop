@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{base::layout(~{::section},'Home')}">
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <section>
+		<!-- START SLIDER -->
+		<style>
+		  /* Carousel Container */
+		  .carousel-container {
+		    position: relative;
+		    max-width: 100%;
+		    height: 420px;
+		    overflow: hidden;
+		    border-radius: 15px;
+		    background: rgba(255, 255, 255, 0.2);
+		    backdrop-filter: blur(15px);
+		    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+		    transition: transform 0.1s ease-out;
+		    perspective: 1000px;
+		  }
+
+		  /* Image Styling */
+		  .carousel-inner .carousel-item img {
+		    transition: transform 5s ease-in-out;
+		    object-fit: cover;
+		    filter: brightness(90%);
+		  }
+
+		  /* Zoom & Parallax Effect */
+		  .carousel-item.active img {
+		    animation: zoomIn 8s ease-in-out infinite alternate;
+		  }
+
+		  @keyframes zoomIn {
+		    0% { transform: scale(1); }
+		    100% { transform: scale(1.15); }
+		  }
+
+		  /* Glowing Gradient Overlay */
+		  .carousel-item::before {
+		    content: "";
+		    position: absolute;
+		    top: 0;
+		    left: 0;
+		    width: 100%;
+		    height: 100%;
+		    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+		    z-index: 1;
+		  }
+
+		  /* Caption Styling */
+		  .carousel-caption {
+		    position: absolute;
+		    bottom: 40px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    text-align: center;
+		    z-index: 2;
+		    animation: floatText 3s ease-in-out infinite alternate;
+		  }
+
+		  .carousel-caption h5 {
+		    font-size: 32px;
+		    font-weight: bold;
+		    color: #fff;
+		    text-shadow: 0px 0px 20px rgba(255, 255, 255, 0.8);
+		  }
+
+		  .carousel-caption p {
+		    font-size: 20px;
+		    font-weight: 500;
+		    color: #f0f0f0;
+		  }
+
+		  /* Caption Animation */
+		  @keyframes floatText {
+		    0% { transform: translateY(0); }
+		    100% { transform: translateY(-10px); }
+		  }
+
+		  /* Custom Buttons with Glow */
+		  .carousel-control-prev,
+		  .carousel-control-next {
+		    filter: drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.6));
+		    transition: all 0.3s ease-in-out;
+		  }
+
+		  .carousel-control-prev:hover,
+		  .carousel-control-next:hover {
+		    filter: drop-shadow(0px 0px 20px rgba(255, 255, 255, 0.9));
+		  }
+		</style>
+
+		<div id="carouselExample" class="carousel slide carousel-container" data-bs-ride="carousel" style="
+		margin-top: 5%;">
+		  <div class="carousel-inner">
+		    <div class="carousel-item active">
+		      <img src="img/newcom.jpg" class="d-block w-100" alt="..." height="420px">
+		      <div class="carousel-caption">
+		        <h5>Welcome to The NeoMart</h5>
+		        <p>Your one-stop shopping destination</p>
+		      </div>
+		    </div>
+		    <div class="carousel-item">
+		      <img src="img/newphoto.jpg" class="d-block w-100" alt="..." height="420px">
+		      <div class="carousel-caption">
+		        <h5>Exclusive Deals</h5>
+		        <p>Get the best offers only here!</p>
+		      </div>
+		    </div>
+		    <div class="carousel-item">
+		      <img src="img/newhomephoto5.jpg" class="d-block w-100" alt="..." height="420px">
+		      <div class="carousel-caption">
+		        <h5>Shop with Confidence</h5>
+		        <p>Safe, Secure, and Seamless</p>
+		      </div>
+		    </div>
+		  </div>
+		  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+		    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+		    <span class="visually-hidden">Previous</span>
+		  </button>
+		  <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+		    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+		    <span class="visually-hidden">Next</span>
+		  </button>
+		</div>
+
+		<!-- JavaScript for 3D Tilt Effect -->
+		<script>
+		  const carousel = document.querySelector(".carousel-container");
+		  
+		  carousel.addEventListener("mousemove", (e) => {
+		    const { width, height, left, top } = carousel.getBoundingClientRect();
+		    const x = (e.clientX - left) / width - 0.8;
+		    const y = (e.clientY - top) / height - 0.8;
+		    
+		    const rotateX = y * -50 + "deg";
+		    const rotateY = x * 50 + "deg";
+
+		    carousel.style.transform = `rotateY(${rotateY}) rotateX(${rotateX})`;
+		  });
+
+		  carousel.addEventListener("mouseleave", () => {
+		    carousel.style.transform = "rotateY(0deg) rotateX(0deg)";
+		  });
+		</script>
+		<!-- END SLIDER -->
+
+		<!-- Theme CSS Variables -->
+		<style>
+			:root {
+				/* Light Theme (Default) */
+				--body-bg: #ffffff;
+				--text-color: #212529;
+				--card-bg: #ffffff;
+				--border-color: #dee2e6;
+				--primary-color: #007bff;
+				--secondary-color: #f8f9fa;
+				--accent-color: #ffc107;
+			}
+			
+			body.dark-mode {
+				/* Dark Theme */
+				--body-bg: #16213e !important;
+				--text-color: #f8f9fa !important;
+				--card-bg: #1a2746 !important;
+				--border-color: #2c3e50 !important;
+				--primary-color: #3498db !important;
+				--secondary-color: #2c3e50 !important;
+				--accent-color: #ffc107 !important;
+			}
+			
+			body {
+				background-color: var(--body-bg);
+				color: var(--text-color);
+				transition: background-color 0.3s ease, color 0.3s ease;
+			}
+			
+			.dark-mode-text {
+				color: var(--text-color);
+			}
+			
+			.section-title-bg {
+				background-color: var(--body-bg);
+			}
+		</style>
+
+		
+        
+		<div class="container-fluid px-1 my-1">
+		    <div class="row">
+		        <!-- Dark Mode Toggle Button -->
+		        <div class="col-12 mb-4 d-flex justify-content-between align-items-center">
+		            <!-- Centered Heading -->
+		            <h2 class="section-title position-relative text-center flex-grow-1 m-0">
+		                <span class="section-title-bg dark-mode-text px-1 position-relative">
+		                    Shop by Category
+		                </span>
+		            </h2>
+		            
+		            <!-- Theme Toggle Button (Placed at End) -->
+		            <button id="themeToggle" class="btn rounded-circle p-2" 
+					style="border-radius: 50%; width: 42px; height: 42px; margin-right: 1%; ">
+		                <i id="themeIcon" class="fa-solid fa-moon"></i>
+		            </button>
+		        </div>
+		        <div class="title-line"></div>
+		        
+		        <!-- Category Slider -->
+		        <div class="col-12 category-slider-container">
+		            <div id="categorySlider">
+		                <!-- Dynamically iterate over each category -->
+		                <div th:each="c : ${category}" class="category-item">
+		                    <div class="category-card">
+		                        <div class="category-img-container">
+		                            <img th:src="@{'img/category_img/'+${c.imageName}}" alt="Category Image">
+		                            <div class="category-overlay">
+		                                <a th:href="@{'/products?category=' + ${c.name}}" class="stretched-link">
+		                                    <h5>[[${c.name}]]</h5>
+		                                </a>
+		                            </div>
+		                        </div>
+		                    </div>
+		                </div>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+
+		<!-- Improved Latest Products Module -->
+		<div class="container-fluid px-0 my-5">
+		    <div class="row mx-0">
+		        <div class="col-12 text-center mb-4">
+					<h2 class="section-title position-relative">
+					    <span class="section-title-bg dark-mode-text px-3 position-relative">Latest Products</span>
+					</h2>
+		            <div class="title-line"></div>
+		        </div>
+		        
+		        <div class="row mx-0 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+					<div class="col" th:each="p:${products}">
+					     <div class="product-card h-100">
+					         <div class="product-img-container">
+					             <img th:src="@{'img/product_img/'+${p.image}}" class="img-fluid" alt="Product Image">
+					             <div class="discount-badge" th:if="${p.discount > 0}">
+					                 <span>[[${p.discount}]]% OFF</span>
+					             </div>
+					             <div class="product-actions">
+								
+<!--									<th:block th:if="${user == null}">
+								    <a href="/signin" class="action-btn">
+								        <i class="fa-solid fa-heart"></i>
+								    </a>
+									</th:block>
+									<th:block th:unless="${user == null}">
+									    <a th:href="@{'/user/wishlist/'+${p.id}+'/'+${user.id}}" 
+									       class="action-btn" 
+									       onclick="toggleHeart(event, this)">
+									       <i th:class="${wishlistStatus != null and wishlistStatus.containsKey(p.id) and wishlistStatus.get(p.id) ? 'fa-solid fa-heart' : 'fa-solid fa-heart'}"></i>
+									    </a>                                        
+									</th:block>
+						  <th:block th:if="${p.stock > 0}">
+							   <th:block th:if="${user == null}">
+							      <a href="/signin" class="action-btn"><i class="fa-solid fa-cart-shopping"></i></a>
+								  
+		                         </th:block>
+							
+								    <th:block th:unless="${user == null}">
+							          <a th:href="@{'/user/addCart?pid=' + ${p.id} + '&uid=' + ${user.id}}" class="action-btn ">
+										<i class="fa-solid fa-cart-shopping"></i></a>
+								 </th:block>
+		                       </th:block>-->	
+									
+									
+									
+								     <a th:href="@{'/product/'+${p.id}}" class="action-btn"><i class="fa-solid fa-eye"></i></a>
+					             </div>
+					         </div>
+					         <div class="product-info">
+					             <h5 class="product-title">
+					                 <a th:href="@{'/product/'+${p.id}}" class="product-link">[[${p.title}]]</a>
+					             </h5>
+					             <p class="product-desc">[[${p.description}]]</p>
+					             <div class="product-price">
+					                 <span class="current-price">₹[[${p.discountPrice}]]</span>
+					                 <span class="original-price" th:if="${p.discount > 0}">₹[[${p.price}]]</span>
+					             </div>
+					         </div>
+					     </div>
+					 </div>
+		        </div>
+		    </div>
+		</div>
+
+		<!-- CSS for the enhanced design -->
+		<style>
+	    	.no-side-margin {
+			    margin-left: 0;
+			    margin-right: 0;
+			    padding-left: 0;
+			    padding-right: 0;
+			}
+		
+	    /* Section title with line */
+		    .section-title {
+		        margin-bottom: 30px;
+		        display: block;
+		    }
+
+		    .title-line {
+		        position: relative;
+		        height: 1px;
+		        background-color: var(--border-color);
+		        margin-top: -15px;
+		        margin-bottom: 20px;
+		    }
+
+		    /* Enhanced carousel */
+		    .carousel {
+		        border-radius: 8px;
+		        overflow: hidden;
+		        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+		    }
+
+		    .carousel-caption {
+		        background-color: rgba(0, 0, 0, 0.5);
+		        border-radius: 10px;
+		        padding: 15px;
+		    }
+
+		    /* Category styling */
+		    .category-slider-container {
+		        overflow: hidden;
+		        padding: 20px 0;
+		    }
+
+		    #categorySlider {
+		        display: flex;
+		        animation: scrollCategories 30s linear infinite;
+		    }
+
+		    .category-item {
+		        padding: 0 5px;
+		        flex-shrink: 0;
+		    }
+
+		    .category-card {
+		        width: 200px;
+		        border-radius: 10px;
+		        overflow: hidden;
+		        transition: transform 0.3s;
+		        box-shadow: 0 .5rem 1rem rgba(0,0,0,.1);
+		        background-color: var(--card-bg);
+		    }
+
+		    .category-card:hover {
+		        transform: translateY(-5px);
+		    }
+
+		    .category-img-container {
+		        position: relative;
+		        width: 100%;
+		        height: 200px;
+		        overflow: hidden;
+		    }
+
+		    .category-img-container img {
+		        width: 100%;
+		        height: 100%;
+		        object-fit: cover;
+		        transition: transform 0.5s;
+		    }
+
+		    .category-card:hover img {
+		        transform: scale(1.1);
+		    }
+
+		    .category-overlay {
+		        position: absolute;
+		        bottom: 0;
+		        left: 0;
+		        right: 0;
+		        background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+		        color: white;
+		        padding: 20px 15px;
+		        text-align: center;
+		    }
+
+		    .category-overlay h5 {
+		        margin: 0;
+		        font-weight: 600;
+		        color: white;
+		    }
+
+		    /* Product card styling */
+		    .product-card {
+		        border-radius: 10px;
+		        overflow: hidden;
+		        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+		        transition: all 0.3s;
+		        background-color: var(--card-bg);
+		        border: 1px solid var(--border-color);
+		    }
+
+		    .product-card:hover {
+		        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+		        transform: translateY(-5px);
+		    }
+
+		    .product-img-container {
+		        position: relative;
+		        overflow: hidden;
+		        height: 200px;
+		    }
+
+		    .product-img-container img {
+		        width: 100%;
+		        height: 100%;
+		        object-fit: cover;
+		        transition: transform 0.5s;
+		    }
+
+		    .product-card:hover .product-img-container img {
+		        transform: scale(1.1);
+		    }
+
+		    .discount-badge {
+		        position: absolute;
+		        top: 10px;
+		        left: 10px;
+		        background-color: var(--accent-color);
+		        color: rgb(0, 0, 0);
+		        padding: 5px 10px;
+		        border-radius: 20px;
+		        font-size: 0.8rem;
+		        font-weight: bold;
+		    }
+
+		    .product-actions {
+		        position: absolute;
+		        bottom: -50px;
+		        left: 0;
+		        right: 0;
+		        display: flex;
+		        justify-content: center;
+		        gap: 10px;
+		        padding: 10px;
+		        background-color: rgba(0,0,0,0.7);
+		        transition: bottom 0.3s;
+		    }
+
+		    .product-card:hover .product-actions {
+		        bottom: 0;
+		    }
+
+			.action-btn {
+			    width: 35px;
+			    height: 35px;
+			    background-color: white;
+			    border-radius: 50%;
+			    display: flex;
+			    align-items: center;
+			    justify-content: center;
+			    color: var(--text-color);
+			    transition: all 0.3s;
+			}
+
+			.dark-mode .action-btn {
+			    background-color: var(--secondary-color);
+			    color: var(--text-color);
+			}
+
+			.action-btn:hover {
+			    background-color: var(--primary-color);
+			    color: white;
+			}
+
+		    .product-info {
+		        padding: 15px;
+		    }
+
+		    .product-title {
+		        font-weight: 600;
+		        margin-bottom: 10px;
+		        font-size: 1rem;
+		        text-overflow: ellipsis;
+		        overflow: hidden;
+		        white-space: nowrap;
+		    }
+
+		    .product-link {
+		        color: var(--text-color);
+		        text-decoration: none;
+		    }
+
+		    .product-desc {
+		        color: var(--text-color);
+		        opacity: 0.7;
+		        font-size: 0.85rem;
+		        margin-bottom: 10px;
+		        display: -webkit-box;
+		        -webkit-line-clamp: 2;
+		        -webkit-box-orient: vertical;
+		        overflow: hidden;
+		        height: 40px;
+		    }
+
+		    .product-price {
+		        display: flex;
+		        align-items: center;
+		        gap: 10px;
+		        margin-bottom: 10px;
+		    }
+
+		    .current-price {
+		        font-weight: 700;
+		        font-size: 1.1rem;
+		        color: var(--accent-color);
+		    }
+
+		    .original-price {
+		        text-decoration: line-through;
+		        color: var(--text-color);
+		        opacity: 0.6;
+		        font-size: 0.9rem;
+		    }
+
+		    .btn-view-details {
+		        background-color: transparent;
+		        border: 1px solid var(--primary-color);
+		        color: var(--primary-color);
+		        transition: all 0.3s;
+		        width: 100%;
+		    }
+
+		    .btn-view-details:hover {
+		        background-color: var(--primary-color);
+		        color: white;
+		    }
+
+		    @keyframes scrollCategories {
+		        0% { transform: translateX(0); }
+		        100% { transform: translateX(calc(-200px * 5)); } /* Adjust based on number of categories */
+		    }
+
+		    /* Responsive adjustments */
+		    @media (max-width: 767.98px) {
+		        .category-card {
+		            width: 150px;
+		            height: 150px;
+		        }
+		        
+		        .category-img-container {
+		            height: 150px;
+		        }
+		        
+		        .product-img-container {
+		            height: 180px;
+		        }
+
+				/* Default Light Mode Styles */
+				#themeToggle {
+				  background-color: #000; /* Black background */
+				  border: 2px solid #00f; /* Blue border to indicate active state */
+				  box-shadow: 0 0 5px rgba(0, 0, 255, 0.5); /* Subtle blue glow */
+				  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+				}
+
+				#themeIcon {
+				  color: #fff; /* White icon */
+				  transition: color 0.3s ease;
+				}
+
+				/* Dark Mode Styles */
+				body.dark-mode #themeToggle {
+				  background-color: #fff; /* White background in dark mode */
+				  border: 2px solid #00f; /* Keep blue border */
+				  box-shadow: 0 0 5px rgba(0, 0, 255, 0.5); /* Keep subtle blue glow */
+				}
+
+				body.dark-mode #themeIcon {
+				  color: #000; /* Black icon in dark mode */
+				}
+		    }
+		</style>
+
+		<!-- JavaScript for theme toggle and duplicating categories -->
+		<script>
+			document.addEventListener("DOMContentLoaded", function() {
+			  // Duplicate category items for infinite scroll
+			  let slider = document.getElementById("categorySlider");
+			  let items = document.querySelectorAll(".category-item");
+
+			  // Clone each item and append to slider
+			  items.forEach(item => {
+			    let clone = item.cloneNode(true);
+			    slider.appendChild(clone);
+			  });
+
+			  // Apply active styling to toggle button
+			  const themeToggle = document.getElementById('themeToggle');
+			  themeToggle.classList.add('active'); // Add an active class
+			  
+			  // Check for saved theme preference
+			  const isDarkMode = localStorage.getItem('darkMode') === 'true';
+			  if (isDarkMode) {
+			    document.body.classList.add('dark-mode');
+			    document.getElementById('themeIcon').classList.remove('fa-moon');
+			    document.getElementById('themeIcon').classList.add('fa-sun');
+			  }
+
+			  // Theme toggle functionality - only toggles the theme, not the active state
+			  themeToggle.addEventListener('click', () => {
+			    document.body.classList.toggle('dark-mode');
+			    const isDark = document.body.classList.contains('dark-mode');
+
+			    // Toggle icon (still change the icon to indicate theme)
+			    const themeIcon = document.getElementById('themeIcon');
+			    if (isDark) {
+			      themeIcon.classList.remove('fa-moon');
+			      themeIcon.classList.add('fa-sun');
+			    } else {
+			      themeIcon.classList.remove('fa-sun');
+			      themeIcon.classList.add('fa-moon');
+			    }
+
+			    // Save preference
+			    localStorage.setItem('darkMode', isDark);
+			  });
+			});
+			
+		</script>
+    </section>
+</body>
+</html>

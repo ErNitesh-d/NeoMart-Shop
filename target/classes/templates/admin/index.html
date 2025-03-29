@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"    th:replace="~{base::layout(~{::section},'Admin Dashboard')}">
+<head>
+	<meta charset="UTF-8">
+	  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	  <title>Admin Dashboard</title>
+	  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+	  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+	  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+</head>
+<body>
+<section>
+
+	<div id="main-content" style="margin-left: 240px; padding: 20px; transition: margin-left 0.3s ease;margin-bottom: 0px;	">
+		<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; margin-top: 35px;">
+		    <h4 style="margin: 0;">Dashboard Overview</h4>
+
+			<div style="display: flex; align-items: center; gap: 0.75rem;">
+			    <select 
+			        class="form-select" 
+			        onchange="handleExport(this.value)"
+			        style="display: inline-flex; align-items: center; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; transition: all 0.3s ease; height: 40px; background-color: #0d6efd; color: white; border: 1px solid #0d6efd; appearance: none; background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\' fill=\'none\' stroke=\'white\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpolyline points=\'2 4 6 8 10 4\'%3E%3C/polyline%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 0.75rem center; padding-right: 2rem;"
+			        onmouseover="this.style.backgroundColor='#0b5ed7'; this.style.borderColor='#0b5ed7'"
+			        onmouseout="this.style.backgroundColor='#0d6efd'; this.style.borderColor='#0d6efd'"
+			        onfocus="this.style.boxShadow='0 0 0 0.25rem rgba(13, 110, 253, 0.25)'"
+			        onblur="this.style.boxShadow='none'"
+			    >
+			        <option value="">------Export-------</option>
+			        <option value="pdf">Export to PDF</option>
+			        <option value="excel">Export to Excel</option>
+			        <option value="csv">Export to CSV</option>
+			    </select>
+
+			    <button 
+			        class="btn" 
+			        onclick="refreshDashboard()"
+			        style="display: inline-flex; align-items: center; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; transition: all 0.3s ease; height: 40px; background-color: #0d6efd; color: white; border: 1px solid #0d6efd; gap: 0.5rem;"
+			        onmouseover="this.style.backgroundColor='#0b5ed7'; this.style.borderColor='#0b5ed7'"
+			        onmouseout="this.style.backgroundColor='#0d6efd'; this.style.borderColor='#0d6efd'"
+			        onfocus="this.style.boxShadow='0 0 0 0.25rem rgba(13, 110, 253, 0.25)'"
+			        onblur="this.style.boxShadow='none'"
+			    >
+			        <i class="fas fa-sync-alt me-2"></i> Refresh
+			    </button>
+			</div>
+		</div>
+
+
+		    <!-- Include jsPDF Library -->
+		    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+		    <script th:inline="javascript">
+				
+				function handleExport(value) {
+				    if (value === 'pdf') {
+				        exportToPDF();
+				    } else if (value === 'excel') {
+				        exportToExcel();
+				    } else if (value === 'csv') {
+				        exportToCSV();
+				    }
+				}
+		        // Inject Thymeleaf model attributes directly into JavaScript variables
+		        const allOrders = /*[[${allOrders}]]*/ 0;
+		        const productCount = /*[[${productCount}]]*/ 0;
+		        const userCount = /*[[${userCount}]]*/ 0;
+		        const totalRevenue = /*[[${totalRevenue}]]*/ 0;
+		        
+		        const PrevMonthReturnedOrders = /*[[${PrevMonthReturnedOrders}]]*/ 0;    
+		        const currentMonthReturnedOrders = /*[[${currentMonthReturnedOrders}]]*/ 0;    
+		        
+		        const PrevMonthTotalOrders = /*[[${PrevMonthTotalOrders}]]*/ 0;    
+		        const currentMonthTotalOrders = /*[[${currentMonthTotalOrders}]]*/ 0;
+		        
+		        const avgOrderValue = /*[[${avgOrderValue}]]*/ 0;
+		        const PrevMonthAvgOrderValue = /*[[${PrevMonthAvgOrderValue}]]*/ 0;
+
+		        const oldCustomerCount = /*[[${oldCustomerCount}]]*/ 0;
+		        const newCustomerCount = /*[[${newCustomerCount}]]*/ 0;
+
+		        const totalMonthlyRevenue = /*[[${totalMonthlyRevenue}]]*/ 0;
+		        const totalPrevMonthlyRevenue = /*[[${totalPrevMonthlyRevenue}]]*/ 0;
+		        
+		        const totalMonthlyOrders = /*[[${totalMonthlyOrders}]]*/ 0;
+		        const totalPrevMonthlyOrders = /*[[${totalPrevMonthlyOrders}]]*/ 0;
+		        
+		        const currentMonthProfit = /*[[${currentMonthProfit}]]*/ 0;
+		        const prevMonthProfit = /*[[${prevMonthProfit}]]*/ 0;
+		        
+		        const monthlySales = /*[[${monthlySales}]]*/ {};
+		        const filteredMonthlySales = Object.entries(monthlySales)
+		            .filter(([month, value]) => value > 0)
+		            .map(([month, value]) => `${month}: ${value.toLocaleString()}`)
+		            .join('\n');
+
+		        function exportToPDF() {
+		            const { jsPDF } = window.jspdf;
+		            const doc = new jsPDF('p', 'mm', 'a4');
+
+		            // Set document properties
+		            doc.setFont('helvetica', 'normal');
+		            doc.setLineWidth(0.5);
+
+		            // Header with Gradient Background
+		            doc.setFillColor(0, 102, 204); // Blue gradient start
+		            doc.rect(0, 0, 210, 40, 'F'); // Full-width header background
+		            doc.setFillColor(0, 153, 255); // Lighter blue
+		            doc.rect(0, 0, 210, 20, 'F'); // Gradient effect
+		            doc.setFontSize(22);
+		            doc.setFont('helvetica', 'bold');
+		            doc.setTextColor(255, 255, 255); // White text
+		            doc.text('Business Performance Report', 105, 25, { align: 'center' });
+
+		            // Subtitle
+		            doc.setFontSize(10);
+		            doc.setTextColor(220, 220, 220); // Light gray
+		            doc.text('A Comprehensive Overview', 105, 33, { align: 'center' });
+
+		            // Helper functions for styling
+		            const addSection = (title, y) => {
+		                doc.setFillColor(240, 248, 255); // Light blue background
+		                doc.rect(10, y - 5, 190, 10, 'F'); // Section header background
+		                doc.setFontSize(14);
+		                doc.setFont('helvetica', 'bold');
+		                doc.setTextColor(0, 102, 204); // Blue text
+		                doc.text(title, 15, y);
+		                doc.setDrawColor(0, 102, 204);
+		                doc.line(15, y + 1, 95, y + 1); // Underline
+		                return y + 10;
+		            };
+
+		            const addDataRow = (label, value, y, isCurrency = false) => {
+		                doc.setFontSize(10);
+		                doc.setFont('helvetica', 'normal');
+		                doc.setTextColor(50, 50, 50); // Dark gray
+		                doc.text(label, 20, y);
+		                doc.setFont('helvetica', 'bold');
+		                doc.setTextColor(0, 0, 0); // Black for values
+		                const formattedValue = isCurrency ? `${Number(value).toLocaleString('en-IN')}` : value.toLocaleString('en-IN');
+		                doc.text(formattedValue, 180, y, { align: 'right' });
+		                doc.setDrawColor(230, 230, 230); // Light gray line
+		                doc.line(20, y + 1, 190, y + 1); // Subtle divider
+		                return y + 8;
+		            };
+
+		            let currentY = 45;
+
+		            // Overall Performance Section
+		            currentY = addSection('Overall Performance', currentY);
+		            currentY = addDataRow('Total Orders', allOrders, currentY);
+		            currentY = addDataRow('Active Products', productCount, currentY);
+		            currentY = addDataRow('Total Customers', userCount, currentY);
+		            currentY = addDataRow('Total Revenue', totalRevenue, currentY, true);
+
+		            // Order Metrics Section
+		            currentY += 5;
+		            currentY = addSection('Order Metrics', currentY);
+		            currentY = addDataRow('Current Month Total Orders', currentMonthTotalOrders, currentY);
+		            currentY = addDataRow('Previous Month Total Orders', PrevMonthTotalOrders, currentY);
+		            currentY = addDataRow('Current Month Returned Orders', currentMonthReturnedOrders, currentY);
+		            currentY = addDataRow('Previous Month Returned Orders', PrevMonthReturnedOrders, currentY);
+
+		            // Customer Insights Section
+		            currentY += 5;
+		            currentY = addSection('Customer Insights', currentY);
+		            currentY = addDataRow('Average Order Value', avgOrderValue, currentY, true);
+		            currentY = addDataRow('Previous Month Avg Order Value', PrevMonthAvgOrderValue, currentY, true);
+		            currentY = addDataRow('New Customers', newCustomerCount, currentY);
+		            currentY = addDataRow('Returning Customers', oldCustomerCount, currentY);
+
+		            // Financial Performance Section
+		            currentY += 5;
+		            currentY = addSection('Financial Performance', currentY);
+		            currentY = addDataRow('Current Month Revenue', totalMonthlyRevenue, currentY, true);
+		            currentY = addDataRow('Previous Month Revenue', totalPrevMonthlyRevenue, currentY, true);
+		            currentY = addDataRow('Current Month Profit', currentMonthProfit, currentY, true);
+		            currentY = addDataRow('Previous Month Profit', prevMonthProfit, currentY, true);
+
+		            // Monthly Sales Section
+		            if (filteredMonthlySales) {
+		                currentY += 5;
+		                currentY = addSection('Monthly Sales Breakdown', currentY);
+		                doc.setFontSize(10);
+		                doc.setFont('helvetica', 'normal');
+		                doc.setTextColor(50, 50, 50);
+		                const salesLines = doc.splitTextToSize(filteredMonthlySales, 170);
+		                doc.text(salesLines, 20, currentY);
+		                currentY += salesLines.length * 6; // Adjust Y based on lines
+		            }
+
+		            // Footer with Date and Page Number
+		            doc.setFontSize(8);
+		            doc.setTextColor(100, 100, 100); // Gray
+		            const pageCount = doc.internal.getNumberOfPages();
+		            for (let i = 1; i <= pageCount; i++) {
+		                doc.setPage(i);
+		                doc.text(`Generated on: ${new Date().toLocaleString()} | Page ${i} of ${pageCount}`, 105, 290, { align: 'center' });
+		            }
+
+		            // Add a subtle watermark (optional)
+		            doc.setFontSize(26);
+		            doc.setTextColor(240, 240, 240); // Very light gray
+		            doc.text('NeoMart Confidential', 105, 150, { align: 'center', angle: 45 });
+
+		            // Save the document
+		            doc.save('Business_Performance_Report.pdf');
+		        }
+				
+				function exportToExcel() {
+				    // Create workbook and worksheet
+				    const workbook = XLSX.utils.book_new();
+				    const worksheetData = [
+				        // Header
+				        ['Business Performance Report'],
+				        ['A Comprehensive Overview'],
+				        ['Generated on: ' + new Date().toLocaleString()],
+				        [],
+				        
+				        // Overall Performance
+				        ['Overall Performance'],
+				        ['Total Orders', allOrders.toLocaleString('en-IN')],
+				        ['Active Products', productCount.toLocaleString('en-IN')],
+				        ['Total Customers', userCount.toLocaleString('en-IN')],
+				        ['Total Revenue', Number(totalRevenue).toLocaleString('en-IN')],
+				        [],
+				        
+				        // Order Metrics
+				        ['Order Metrics'],
+				        ['Current Month Total Orders', currentMonthTotalOrders.toLocaleString('en-IN')],
+				        ['Previous Month Total Orders', PrevMonthTotalOrders.toLocaleString('en-IN')],
+				        ['Current Month Returned Orders', currentMonthReturnedOrders.toLocaleString('en-IN')],
+				        ['Previous Month Returned Orders', PrevMonthReturnedOrders.toLocaleString('en-IN')],
+				        [],
+				        
+				        // Customer Insights
+				        ['Customer Insights'],
+				        ['Average Order Value', Number(avgOrderValue).toLocaleString('en-IN')],
+				        ['Previous Month Avg Order Value', Number(PrevMonthAvgOrderValue).toLocaleString('en-IN')],
+				        ['New Customers', newCustomerCount.toLocaleString('en-IN')],
+				        ['Returning Customers', oldCustomerCount.toLocaleString('en-IN')],
+				        [],
+				        
+				        // Financial Performance
+				        ['Financial Performance'],
+				        ['Current Month Revenue', Number(totalMonthlyRevenue).toLocaleString('en-IN')],
+				        ['Previous Month Revenue', Number(totalPrevMonthlyRevenue).toLocaleString('en-IN')],
+				        ['Current Month Profit', Number(currentMonthProfit).toLocaleString('en-IN')],
+				        ['Previous Month Profit', Number(prevMonthProfit).toLocaleString('en-IN')],
+				        [],
+				        
+				        // Monthly Sales Breakdown
+				        ['Monthly Sales Breakdown'],
+				        ...Object.entries(monthlySales)
+				            .filter(([_, value]) => value > 0)
+				            .map(([month, value]) => [month, value.toLocaleString('en-IN')])
+				    ];
+
+				    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+				    
+				    // Add worksheet to workbook
+				    XLSX.utils.book_append_sheet(workbook, worksheet, 'Performance Report');
+				    
+				    // Export
+				    XLSX.writeFile(workbook, 'Business_Performance_Report.xlsx');
+				}
+
+				function exportToCSV() {
+				    let csvContent = 'Business Performance Report\n';
+				    csvContent += 'A Comprehensive Overview\n';
+				    csvContent += `Generated on: ${new Date().toLocaleString()}\n\n`;
+				    
+				    // Overall Performance
+				    csvContent += 'Overall Performance\n';
+				    csvContent += `Total Orders,${allOrders.toLocaleString('en-IN')}\n`;
+				    csvContent += `Active Products,${productCount.toLocaleString('en-IN')}\n`;
+				    csvContent += `Total Customers,${userCount.toLocaleString('en-IN')}\n`;
+				    csvContent += `Total Revenue,${Number(totalRevenue).toLocaleString('en-IN')}\n\n`;
+				    
+				    // Order Metrics
+				    csvContent += 'Order Metrics\n';
+				    csvContent += `Current Month Total Orders,${currentMonthTotalOrders.toLocaleString('en-IN')}\n`;
+				    csvContent += `Previous Month Total Orders,${PrevMonthTotalOrders.toLocaleString('en-IN')}\n`;
+				    csvContent += `Current Month Returned Orders,${currentMonthReturnedOrders.toLocaleString('en-IN')}\n`;
+				    csvContent += `Previous Month Returned Orders,${PrevMonthReturnedOrders.toLocaleString('en-IN')}\n\n`;
+				    
+				    // Customer Insights
+				    csvContent += 'Customer Insights\n';
+				    csvContent += `Average Order Value,${Number(avgOrderValue).toLocaleString('en-IN')}\n`;
+				    csvContent += `Previous Month Avg Order Value,${Number(PrevMonthAvgOrderValue).toLocaleString('en-IN')}\n`;
+				    csvContent += `New Customers,${newCustomerCount.toLocaleString('en-IN')}\n`;
+				    csvContent += `Returning Customers,${oldCustomerCount.toLocaleString('en-IN')}\n\n`;
+				    
+				    // Financial Performance
+				    csvContent += 'Financial Performance\n';
+				    csvContent += `Current Month Revenue,${Number(totalMonthlyRevenue).toLocaleString('en-IN')}\n`;
+				    csvContent += `Previous Month Revenue,${Number(totalPrevMonthlyRevenue).toLocaleString('en-IN')}\n`;
+				    csvContent += `Current Month Profit,${Number(currentMonthProfit).toLocaleString('en-IN')}\n`;
+				    csvContent += `Previous Month Profit,${Number(prevMonthProfit).toLocaleString('en-IN')}\n\n`;
+				    
+				    // Monthly Sales Breakdown
+				    csvContent += 'Monthly Sales Breakdown\n';
+				    const monthlySalesData = Object.entries(monthlySales)
+				        .filter(([_, value]) => value > 0)
+				        .map(([month, value]) => `${month},${value.toLocaleString('en-IN')}`)
+				        .join('\n');
+				    csvContent += monthlySalesData;
+
+				    // Create and download CSV file
+				    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+				    const link = document.createElement('a');
+				    const url = URL.createObjectURL(blob);
+				    link.setAttribute('href', url);
+				    link.setAttribute('download', 'Business_Performance_Report.csv');
+				    document.body.appendChild(link);
+				    link.click();
+				    document.body.removeChild(link);
+				}
+		    </script>
+		<script>
+		    // Refresh button function
+		    function refreshDashboard() {
+		        location.reload(); // Refreshes the page
+		    }
+		</script>
+
+
+            <!-- Stats Cards with Sparklines -->
+            <div class="row">
+				<div class="col-md-3 mb-4">
+				    <div style="border: none; border-radius: 15px; padding: 20px; transition: all 0.3s ease; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); background: linear-gradient(135deg, #4361ee, #4895ef); color: white; position: relative; overflow: hidden; min-height: 160px;">
+				        <div style="text-align: center; font-size: 20px; font-weight: 800; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; ">Total Orders</div>
+				        <div style="font-size: 32px; font-weight: 800; text-align: center;" >[[${allOrders}]]</div>
+				        <i class="fas fa-shopping-cart" style="position: absolute; right: 20px; bottom: 10px; font-size: 55px; opacity: 0.15; transform: rotate(-10deg);"></i>
+				       </div>
+				</div>
+
+				<div class="col-md-3 mb-4">
+				    <div style="border: none; border-radius: 15px; padding: 20px; transition: all 0.3s ease; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); background: linear-gradient(135deg, #2ecc71, #26de81); color: white; position: relative; overflow: hidden; min-height: 160px;">
+				        <div style="text-align: center; font-size: 20px;font-weight: 800;	 opacity: 0.9; text-transform: uppercase; letter-spacing: 1px;">Active Products</div>
+				        <div style="font-size: 32px; font-weight: 800; text-align: center;" >[[${productCount}]]</div>
+				       <i class="fas fa-cube" style="position: absolute; right: 20px; bottom: 10px; font-size: 55px; opacity: 0.15; transform: rotate(-10deg);"></i>
+				      
+				    </div>
+				</div>
+                <div class="col-md-3 mb-4">
+                    <div style="text-align: center; border: none; border-radius: 15px; padding: 20px; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); background: linear-gradient(45deg, #f39c12, #f1c40f); color: white; position: relative; overflow: hidden; min-height: 160px;">
+                        <div style="font-size: 20px;font-weight: 800; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px;">Customers</div>
+                        <div style="font-size: 31px; font-weight: 800;">[[${userCount}]]</div>
+                    
+                        <i class="fas fa-user" style="position: absolute; right: 20px; bottom: 10px; font-size: 50px; opacity: 0.2; transform: rotate(-15deg);"></i>
+                         </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div style="border: none; border-radius: 15px; padding: 20px; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); background: linear-gradient(45deg, #f72585, #fd3a69); color: white; position: relative; overflow: hidden; min-height: 160px;">
+                        <div style="font-size: 20px; font-weight: 800;text-align: center; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px;">Revenue</div>
+                        <div style="font-size: 28px; font-weight: 700;text-align: center;">₹ [[${totalRevenue}]]</div>
+   
+                        <i class="fas fa-dollar-sign" style="position: absolute; right: 20px; bottom: 10px; font-size: 50px; opacity: 0.2; transform: rotate(-15deg);"></i>
+                    </div>
+                </div>
+            </div>
+            
+			<!-- KPI Summary Cards -->
+			<div class="row mb-4">
+			    <div class="col-12">
+			        <div style="background: linear-gradient(135deg, #4158D0, #C850C0); padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); transition: all 0.3s ease; color: white; overflow: hidden; position: relative;">
+			            <!-- Decorative elements -->
+			            <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); z-index: 0;"></div>
+			            <div style="position: absolute; bottom: -60px; left: -60px; width: 180px; height: 180px; border-radius: 50%; background: rgba(255, 255, 255, 0.08); z-index: 0;"></div>
+			            
+			            <h5 style="margin-bottom: 20px; text-align: center; font-weight: 700; font-size: 1.5rem; letter-spacing: 1px; position: relative; z-index: 1; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+			                <i class="fas fa-chart-line" style="margin-right: 10px;"></i>Monthly Key Performance Metrics
+			            </h5>
+			            
+						<div class="row" style="position: relative; z-index: 1;">
+						    <!-- Retention Rate Card -->
+						    <div class="col-md-4 col-sm-12 mb-2">
+						        <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(4px); border-radius: 12px; padding: 12px; height: auto; transform: translateY(0); transition: all 0.3s ease; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);" 
+						             onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 5px 15px rgba(0, 0, 0, 0.2)';" 
+						             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 10px rgba(0, 0, 0, 0.1)';">
+						            <div style="text-align: center; padding: 5px;">
+						                <div style="font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 3px; color: rgba(255, 255, 255, 0.9);">
+						                    <i class="fas fa-sync-alt" style="margin-right: 5px;"></i>Retention Rate
+						                </div>
+						                <div style="font-size: 28px; font-weight: 700; margin: 8px 0; background: linear-gradient(135deg, #fff, #e0e0e0); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 1px 6px rgba(0,0,0,0.1);">
+						                    [[${customerRetentionRate}]]<span style="font-size: 18px;">%</span>
+						                </div>
+						                <div id="gauge-conversion" style="height: 70px; margin-top: 5px;"></div>
+						            </div>
+						        </div>
+						    </div>
+						    
+						    <!-- Avg. Order Value Card -->
+						    <div class="col-md-4 col-sm-12 mb-2">
+						        <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(4px); border-radius: 12px; padding: 12px; height: auto; transform: translateY(0); transition: all 0.3s ease; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);" 
+						             onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 5px 15px rgba(0, 0, 0, 0.2)';" 
+						             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 10px rgba(0, 0, 0, 0.1)';">
+						            <div style="text-align: center; padding: 5px;">
+						                <div style="font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 3px; color: rgba(255, 255, 255, 0.9);">
+						                    <i class="fas fa-shopping-cart" style="margin-right: 5px;"></i>Avg. Order Value
+						                </div>
+						                <div style="font-size: 28px; font-weight: 700; margin: 8px 0; background: linear-gradient(135deg, #fff, #e0e0e0); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 1px 6px rgba(0,0,0,0.1);">
+						                    [[${avgOrderValue}]]
+						                </div>
+						                <div id="gauge-aov" style="height: 90px; margin-top: 5px;"></div>
+						            </div>
+						        </div>
+						    </div>
+						    
+						    <!-- New Customers Card -->
+						    <div class="col-md-4 col-sm-12 mb-2">
+						        <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(4px); border-radius: 12px; padding: 12px; height: auto; transform: translateY(0); transition: all 0.3s ease; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);" 
+						             onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 5px 15px rgba(0, 0, 0, 0.2)';" 
+						             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 10px rgba(0, 0, 0, 0.1)';">
+						            <div style="text-align: center; padding: 5px;">
+						                <div style="font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 3px; color: rgba(255, 255, 255, 0.9);">
+						                    <i class="fas fa-user-plus" style="margin-right: 5px;"></i>New Customers
+						                </div>
+						                <div style="font-size: 28px; font-weight: 700; margin: 8px 0; background: linear-gradient(135deg, #fff, #e0e0e0); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 1px 6px rgba(0,0,0,0.1);">
+						                    [[${newCustomerCount}]]
+						                </div>
+						                <div id="gauge-retention" style="height: 90px; margin-top: 5px;"></div>
+						            </div>
+						        </div>
+						    </div>
+						</div>
+
+			            
+			        </div>
+			    </div>
+			</div>
+
+			<!-- Add responsive adjustments -->
+			<style>
+			@media (max-width: 768px) {
+			    .col-md-4 {
+			        margin-bottom: 15px;
+			    }
+			}
+
+			@media (max-width: 576px) {
+			    [style*="font-size: 38px"] {
+			        font-size: 30px !important;
+			    }
+			    
+			    [style*="font-size: 1.5rem"] {
+			        font-size: 1.2rem !important;
+			    }
+			    
+			    [style*="padding: 25px"] {
+			        padding: 15px !important;
+			    }
+			}
+			</style>
+
+			<script>
+			    var returnOrderChange = parseFloat("[[${returnOrderChange}]]");
+			    var percentageChange = parseFloat("[[${percentageChange}]]");
+				var customerGrowth=parseFloat("[[${customerGrowth}]]");
+				   
+				 document.addEventListener("DOMContentLoaded", function () {
+			        initGauge("gauge-conversion", returnOrderChange, getGaugeColorForReturn(returnOrderChange)); // Dynamic color
+			        initGauge("gauge-aov", percentageChange, getGaugeColor(percentageChange)); // Dynamic color
+			        initGauge("gauge-retention", customerGrowth, getGaugeColor(customerGrowth)); // Static color
+			    });
+
+			    function getGaugeColor(value) {
+			        return value >= 0 ? "#2ed573" : "#ff4757"; // 🟢 Green for positive, 🔴 Red for negative
+			    }
+
+				function getGaugeColorForReturn(value) {
+						        return value >= 0 ? "#ff4757" : "#2ed573"; // 🟢 Green for positive, 🔴 Red for negative
+						    }
+			    function initGauge(elementId, value, color) {
+			        var absValue = Math.abs(value);
+			        var startAngle = value < 0 ? -360 : 1;
+			        var endAngle = value < 0 ? 0 : 360;
+
+			        var options = {
+			            series: [absValue],
+			            chart: { height: 200, type: "radialBar" },
+			            plotOptions: {
+			                radialBar: {
+			                    startAngle: startAngle,
+			                    endAngle: endAngle,
+			                    track: {
+			                        background: "#e0e0e0",
+			                        strokeWidth: "100%" // Full track visible
+			                    },
+			                    hollow: { size: "50%" },
+			                    dataLabels: {
+			                        name: { show: false },
+			                        value: {
+			                            fontSize: "24px",
+			                            fontWeight: "bold",
+			                            color: "white",
+			                            formatter: function () { return value + "%"; }
+			                        }
+			                    }
+			                }
+			            },
+			            fill: { colors: [color] },
+			            stroke: { lineCap: "round", width: 14 }
+			        };
+
+			        new ApexCharts(document.querySelector("#" + elementId), options).render();
+			    }
+			</script>
+
+
+ 
+				    <div class="col-md-12 mb-4">
+				        <div style="background: linear-gradient(135deg, 	rgb(255, 128, 0), rgb(128, 128, 255)); color: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); margin-bottom: 20px; transition: all 0.3s ease;">
+				            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+				                <h5 style="margin-bottom: 0;">Sales Overview</h5>
+				               <!-- <div>
+				                    <select cl	ass="form-select form-select-sm" style="width: auto; display: inline-block; background: white; color: black;" onchange="updateSalesChart(this.value)">
+				                        <option value="daily">Daily</option>
+				                        <option value="monthly" selected>Monthly</option>
+				                        <option value="yea	rly">Yearly</option>
+				                    </select>
+				                </div>-->
+				            </div>
+				            <div style="display: flex; justify-content: space-around; margin-bottom: 5px;">
+				                <div style="text-align: center; padding: 10px;">
+				                    <div style="font-size: 14px;">Revenue</div>
+				                    <div style="font-size: 24px; font-weight: 700;">[[${totalMonthlyRevenue}]]</div>
+									<div th:style="'color: ' + (${monthGrowth} >= 0 ? '#2ecc71' : '#e74c3c')">
+									    <i class="fas" th:classappend="${monthGrowth} >= 0 ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+									   <b> [[${monthGrowth}]]%</b>
+									</div>
+
+                                </div>
+				                <div style="text-align: center; padding: 10px;">
+				                    <div style="font-size: 14px;">Orders</div>
+				                    <div style="font-size: 24px; font-weight: 700;">[[${totalMonthlyOrders}]]</div>
+									<div th:style="'color: ' + (${monthOrderGrowth} >= 0 ? '#2ecc71' : '#e74c3c')">
+									    <i class="fas" th:classappend="${monthOrderGrowth} >= 0 ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+									    <b>[[${monthOrderGrowth}]]%</b>
+									</div>
+				                </div>
+								<div style="text-align: center; padding: 10px;">
+								    <div style="font-size: 14px;">Profit</div>
+								    <div style="font-size: 24px; font-weight: 700;">[[${currentMonthProfit}]]</div>
+									<div th:style="'color: ' + (${profitGrowth} >= 0 ? '#2ecc71' : '#e74c3c')">
+									    <i class="fas" th:classappend="${profitGrowth} >= 0 ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+									    <b>[[${profitGrowth}]]%</b>
+									</div>
+								</div>
+				            </div>
+				            <div style="position: relative; height: 350px;">
+				                <canvas id="salesChart"></canvas>
+				            </div>
+				        </div>
+				    </div>
+					<script th:inline="javascript">
+					document.addEventListener('DOMContentLoaded', function() {
+					  // Access the monthlySales data from Thymeleaf model attribute
+					  const salesData = /*[[${monthlySales}]]*/ {};
+
+					  const months = Object.keys(salesData);
+					  const values = Object.values(salesData);
+
+					  // Function to format numbers in Indian numbering system
+					  const formatIndianCurrency = (num) => {
+					    const value = Math.round(num * 100) / 100;
+					    const result = value.toLocaleString('en-IN', {
+					      maximumFractionDigits: 2,
+					      minimumFractionDigits: 2
+					    });
+					    return '₹' + result;
+					  };
+					  
+					  // Add CSS styles for chart enhancement
+					  const styleElement = document.createElement('style');
+					  styleElement.textContent = `
+					    .chart-container {
+					   background: linear-gradient(135deg, 	rgb(255, 128, 0), rgb(128, 128, 255));
+					      border-radius: 20px;
+					      padding: 25px;
+					      margin: 20px auto;
+					      height: 350px;
+					      position: relative;
+					      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+					      border: 1px solid rgba(255, 255, 255, 0.1);
+					      overflow: hidden;
+					      animation: fadeIn 0.8s ease-out;
+					    }
+					    
+					    @keyframes fadeIn {
+					      from { opacity: 0; transform: translateY(20px); }
+					      to { opacity: 1; transform: translateY(0); }
+					    }
+					    
+					    .chart-container::before {
+					      content: '';
+					      position: absolute;
+					      top: -50%;
+					      right: -50%;
+					      width: 600px;
+					      height: 600px;
+					      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+					      z-index: 0;
+					      animation: pulse 15s infinite ease-in-out;
+					    }
+					    
+					    @keyframes pulse {
+					      0% { transform: scale(1); opacity: 0.1; }
+					      50% { transform: scale(1.1); opacity: 0.2; }
+					      100% { transform: scale(1); opacity: 0.1; }
+					    }
+					    
+					    .chart-container::after {
+					      content: '';
+					      position: absolute;
+					      bottom: 0;
+					      left: 0;
+					      right: 0;
+					      height: 2px;
+					      background: linear-gradient(90deg, rgba(255,126,95,0.7), rgba(254,180,123,0.7), rgba(123,104,238,0.7), rgba(106,90,205,0.7));
+					      animation: glow 3s infinite;
+					    }
+					    
+					    @keyframes glow {
+					      0% { opacity: 0.3; }
+					      50% { opacity: 1; }
+					      100% { opacity: 0.3; }
+					    }
+					    
+					    .floating-dots {
+					      position: absolute;
+					      width: 100%;
+					      height: 100%;
+					      top: 0;
+					      left: 0;
+					      overflow: hidden;
+					      z-index: 0;
+					      opacity: 0.4;
+					    }
+					    
+					    .dot {
+					      position: absolute;
+					      width: 6px;
+					      height: 6px;
+					      border-radius: 50%;
+					      background: rgba(255, 255, 255, 0.3);
+					      animation: float 15s infinite linear;
+					    }
+					    
+					    @keyframes float {
+					      0% { transform: translateY(0) translateX(0); opacity: 0; }
+					      10% { opacity: 1; }
+					      90% { opacity: 1; }
+					      100% { transform: translateY(-700px) translateX(100px); opacity: 0; }
+					    }
+					    
+					    .chart-title {
+					      color: white;
+					      font-size: 20px;
+					      font-weight: 600;
+					      margin-bottom: 15px;
+					      position: relative;
+					      z-index: 1;
+					      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+					      display: inline-block;
+					    }
+					    
+					    .chart-title::after {
+					      content: '';
+					      position: absolute;
+					      bottom: -5px;
+					      left: 0;
+					      width: 40px;
+					      height: 3px;
+					      background: linear-gradient(90deg, #ff7e5f, #6a5acd);
+					      border-radius: 3px;
+					    }
+					  `;
+					  document.head.appendChild(styleElement);
+					  
+					  // Create chart container
+					  const chartContainer = document.createElement('div');
+					  chartContainer.className = 'chart-container';
+					  
+					  // Get the original chart element
+					  const chartElement = document.getElementById('salesChart');
+					  
+					  // Create floating dots background
+					  const dotsContainer = document.createElement('div');
+					  dotsContainer.className = 'floating-dots';
+					  chartContainer.appendChild(dotsContainer);
+					  
+					  // Create random dots
+					  for (let i = 0; i < 30; i++) {
+					    const dot = document.createElement('div');
+					    dot.className = 'dot';
+					    dot.style.left = `${Math.random() * 100}%`;
+					    dot.style.top = `${Math.random() * 100}%`;
+					    dot.style.width = `${3 + Math.random() * 6}px`;
+					    dot.style.height = dot.style.width;
+					    dot.style.animationDelay = `${Math.random() * 15}s`;
+					    dot.style.animationDuration = `${10 + Math.random() * 20}s`;
+					    dotsContainer.appendChild(dot);
+					  }
+					  
+					  // Add chart title
+					  const chartTitle = document.createElement('div');
+					  chartTitle.className = 'chart-title';
+					  chartTitle.textContent = 'Sales Performance';
+					  chartContainer.appendChild(chartTitle);
+					  
+					  // Insert the container before the chart and move the chart inside it
+					  chartElement.parentNode.insertBefore(chartContainer, chartElement);
+					  chartContainer.appendChild(chartElement);
+					  
+					  // Set chart dimensions
+					  chartElement.style.width = '100%';
+					  chartElement.style.height = '90%';
+					  chartElement.style.position = 'relative';
+					  chartElement.style.zIndex = '1';
+
+					  const ctx = document.getElementById('salesChart').getContext('2d');
+					  
+					  // Create gradient background for the chart
+					  const gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
+					  gradientFill.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
+					  gradientFill.addColorStop(1, 'rgba(255, 255, 255, 0.02)');
+					  
+					  // Create gradient line for visual effect
+					  const gradientLine = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0);
+					  gradientLine.addColorStop(0, '#ff7e5f');
+					  gradientLine.addColorStop(0.5, '#feb47b');
+					  gradientLine.addColorStop(1, '#6a5acd');
+					  
+					  // Add font link
+					  const fontLink = document.createElement('link');
+					  fontLink.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap';
+					  fontLink.rel = 'stylesheet';
+					  document.head.appendChild(fontLink);
+					  
+					  // Configure Chart.js with animations
+					  Chart.defaults.font.family = "'Poppins', 'Helvetica', 'Arial', sans-serif";
+					  
+					  new Chart(ctx, {
+					    type: 'line',
+					    data: {
+					      labels: months,
+					      datasets: [{
+					        label: 'Monthly Sales',
+					        data: values,
+					        borderColor: gradientLine,
+					        backgroundColor: gradientFill,
+					        borderWidth: 3,
+					        pointBackgroundColor: 'white',
+					        pointBorderColor: '#6a5acd',
+					        pointRadius: 6,
+					        pointHoverRadius: 10,
+					        pointBorderWidth: 3,
+					        tension: 0.4,
+					        fill: true
+					      }]
+					    },
+					    options: {
+					      responsive: true,
+					      maintainAspectRatio: false,
+					      animation: {
+					        duration: 2000,
+					        easing: 'easeOutQuart'
+					      },
+					      plugins: {
+					        legend: {
+					          display: true,
+					          position: 'top',
+					          labels: {
+					            boxWidth: 12,
+					            usePointStyle: true,
+					            color: 'white',
+					            font: {
+					              size: 12,
+					              weight: '500'
+					            },
+					            padding: 20
+					          }
+					        },
+					        tooltip: {
+					          callbacks: {
+					            label: function(context) {
+					              return formatIndianCurrency(context.raw);
+					            }
+					          },
+					          backgroundColor: 'rgba(30, 30, 60, 0.9)',
+					          titleColor: 'white',
+					          bodyColor: 'white',
+					          padding: 12,
+					          cornerRadius: 8,
+					          borderColor: 'rgba(255, 255, 255, 0.1)',
+					          borderWidth: 1,
+					          displayColors: false,
+					          caretSize: 6,
+					          titleFont: {
+					            size: 14,
+					            weight: 'bold'
+					          },
+					          bodyFont: {
+					            size: 13
+					          },
+					          animation: {
+					            duration: 400
+					          }
+					        }
+					      },
+					      scales: {
+					        y: {
+					          beginAtZero: true,
+					          grid: {
+					            color: 'rgba(255, 255, 255, 0.05)',
+					            drawBorder: false,
+					            lineWidth: 1
+					          },
+					          border: {
+					            display: false
+					          },
+					          ticks: {
+					            color: 'rgba(255, 255, 255, 0.7)',
+					            font: {
+					              size: 11,
+					              weight: '500'
+					            },
+					            padding: 10,
+					            callback: function(value) {
+					              if (value >= 1000) {
+					                return '₹' + value / 1000 + 'k';
+					              }
+					              return '₹' + value;
+					            }
+					          }
+					        },
+					        x: {
+					          grid: {
+					            display: false
+					          },
+					          border: {
+					            display: false
+					          },
+					          position: 'bottom', // This ensures labels are below the line
+					          ticks: {
+					            color: 'rgba(255, 255, 255, 0.7)',
+					            font: {
+					              size: 11,
+					              weight: '500'
+					            },
+					            padding: 15 // Increase padding to push labels further below
+					          }
+					        }
+					      },
+					      layout: {
+					        padding: {
+					          bottom: 20 // Add more padding at the bottom to accommodate labels
+					        }
+					      },
+					      interaction: {
+					        mode: 'index',
+					        intersect: false
+					      },
+					      elements: {
+					        line: {
+					          cubicInterpolationMode: 'monotone'
+					        }
+					      },
+						  ticks: {
+						  				color: 'rgba(255, 255, 255, 0.7)',
+						  				font: {
+						  				size: 11,
+						  				weight: '500'
+						  				},
+						  				padding: 8
+								}
+					    }
+					  });
+					});
+				
+					</script>
+
+		     <!-- New Product Performance & Category Split -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div style="background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); margin-bottom: 20px; transition: all 0.3s ease;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h5 style="margin-bottom: 0;">Top Products</h5>
+                           
+                        </div>
+                        <div class="table-responsive">
+							<table class="table table-striped table-hover shadow-sm rounded">
+							    <thead class="bg-light">
+							        <tr class="text-secondary text-uppercase small">
+							            <th class="fw-bold">Product</th>
+							            <th class="fw-bold">Sales</th>
+							            <th class="fw-bold">Price</th>
+							            <th class="fw-bold">Status</th>
+										<!--<th class="fw-bold">Category</th>-->
+							        </tr>
+							    </thead>
+							    <tbody>
+							        <tr th:each="entry : ${topSellingProducts}" class="align-middle">
+							            <td class="fw-semibold text-dark" th:text="${entry.key.title}"></td>
+							            <td class="fw-bold text-primary text-center" th:text="${entry.value}"></td> <!-- Total Quantity Sold -->
+							            <td class="fw-semibold text-success" th:text="'₹ ' + ${entry.key.discountPrice}"></td>
+							            <td>
+							                <span th:if="${entry.key.stock > 10}" class="badge bg-success">In Stock</span>
+							                <span th:if="${entry.key.stock > 0 && entry.key.stock <= 10}" class="badge bg-warning text-dark">Low Stock</span>
+							                <span th:if="${entry.key.stock == 0}" class="badge bg-danger">Out of Stock</span>
+							            </td>
+										<!--<td class="fw-semibold text-success" th:text=" ${entry.key.category}"></td>-->
+							        </tr>
+							    </tbody>
+							</table>
+
+                        </div>
+                    </div>
+                </div>
+               
+				   <div class="col-md-6 mb-4">
+					<div class="category-legend" style="display: flex; justify-content: space-around; margin-top: 15px;">
+					    <th:block th:each="entry, iterStat : ${topSellingCategories}">
+					        <div class="animated-category" style="text-align: center;">
+					            <div th:style="'width: 12px; height: 12px; background-color: ' + ${legendColors[iterStat.index]} + '; border-radius: 50%; margin: 0 auto 5px;'"></div>
+					            <div style="font-size: 12px; color: #777;" th:text="${entry.category}"></div>
+					        </div>
+					    </th:block>
+					</div>
+      	        <div id="categoryChart" style="height: 400px;"></div>
+						
+				    </div>
+
+
+				<style>
+				    @keyframes fadeIn {
+				        from { opacity: 0; transform: translateY(10px); }
+				        to { opacity: 1; transform: translateY(0); }
+				    }
+
+				    .animated-category {
+				        opacity: 0;
+				        display: inline-block;
+				        animation: fadeIn 1s ease-in-out forwards;
+				    }
+
+				    .animated-category:nth-child(1) { animation-delay: 0.2s; }
+				    .animated-category:nth-child(2) { animation-delay: 0.4s; }
+				    .animated-category:nth-child(3) { animation-delay: 0.6s; }
+				    .animated-category:nth-child(4) { animation-delay: 0.8s; }
+				</style>
+
+				<!-- ✅ Move scripts here so they load before execution -->
+				<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+				<script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.37.1/apexcharts.min.js"></script>
+
+				<script th:inline="javascript">
+				    document.addEventListener("DOMContentLoaded", function () {
+				        console.log("Page Loaded: Initializing category chart.");
+
+				        // ✅ Ensure Thymeleaf properly parses the data into a JSON array
+				        let categoryData = /*[[${topSellingCategories}]]*/ [];
+				     
+
+				        if (!categoryData || categoryData.length === 0) {
+				        
+				            return;
+				        }
+
+				        // ✅ Extract category names and sales values
+				        const categories = categoryData.map(entry => entry.category);
+				        const sales = categoryData.map(entry => entry.sales);
+
+				        // ✅ Render the category chart with extracted data
+				        renderCategoryChart(categories, sales);
+				    });
+
+				    function renderCategoryChart(categories, sales) {
+				        const categoryChartEl = document.getElementById("categoryChart");
+				        if (!categoryChartEl) {
+				
+				            return;
+				        }
+				        var options = {
+				            series: sales,
+				            chart: { 
+				                type: "donut", 
+				                animations: { 
+				                    enabled: true, 
+				                    easing: "easeinout", 
+				                    speed: 800 
+				                } 
+				            },
+				            labels: categories,
+				            colors: ["#4361ee", "#2ecc71", "#f39c12", "#e74c3c", "#9b59b6"],
+				            legend: { position: "right" }
+				        };
+
+				        var chart = new ApexCharts(categoryChartEl, options);
+				        chart.render();
+				    }
+				</script>
+            </div>
+        </div>
+
+</section>
+		
+</body>
+</html>

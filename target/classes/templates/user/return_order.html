@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{base::layout(~{::section},'Return Order')}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Return Order</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<section>
+<section>
+    <div style="max-width: 100%; margin: 0 auto; padding: 2rem; background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 100%); border-radius: 20px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); transition: all 0.5s ease; animation: fadeIn 0.8s ease-in-out;">
+        <h2 style="position: relative; color: #212529; font-weight: 700; margin-bottom: 2rem; text-align: center; font-size: 1.75rem; animation: slideInDown 0.6s ease-in-out;">Return Your Order</h2>
+        
+        <form th:action="@{'/user/save-return-order/' +${order.orderId}}" method="get" id="returnOrderForm" novalidate>
+            <div style="display: flex; flex-wrap: wrap; margin: 0 -15px;">
+                <div style="flex: 0 0 50%; max-width: 50%; padding: 0 15px; animation: slideInLeft 0.6s ease-in-out;">
+                    <div style="background-color: white; border-radius: 15px; padding: 2rem; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05); transition: all 0.3s ease; animation: slideInUp 0.6s ease-in-out;">
+                        <h3 style="position: relative; color: #212529; font-weight: 700; margin-bottom: 2rem; text-align: center; font-size: 1.5rem;">Pickup Address</h3>
+                        
+                        <div style="display: flex; flex-wrap: wrap; margin: 0 -10px;">
+                            <div style="flex: 0 0 50%; max-width: 50%; padding: 0 10px; margin-bottom: 1.5rem;">
+                                <label for="firstName" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #212529; font-size: 0.9rem; transition: all 0.3s ease;"><i class="fas fa-user" style="color: #4361ee; margin-right: 0.5rem; font-size: 1.2rem;"></i>First Name</label>
+                                <input type="text" id="firstName" name="firstName" th:value="${order.orderAddress.firstName}" readonly style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #ced4da; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease; background-color: rgba(255, 255, 255, 0.9);">
+                            </div>
+                            <div style="flex: 0 0 50%; max-width: 50%; padding: 0 10px; margin-bottom: 1.5rem;">
+                                <label for="lastName" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #212529; font-size: 0.9rem; transition: all 0.3s ease;"><i class="fas fa-user" style="color: #4361ee; margin-right: 0.5rem; font-size: 1.2rem;"></i>Last Name</label>
+                                <input type="text" id="lastName" name="lastName" th:value="${order.orderAddress.lastName}" readonly style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #ced4da; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease; background-color: rgba(255, 255, 255, 0.9);">
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; flex-wrap: wrap; margin: 0 -10px;">
+                            <div style="flex: 0 0 50%; max-width: 50%; padding: 0 10px; margin-bottom: 1.5rem;">
+                                <label for="email" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #212529; font-size: 0.9rem; transition: all 0.3s ease;"><i class="fas fa-envelope" style="color: #4361ee; margin-right: 0.5rem; font-size: 1.2rem;"></i>Email</label>
+                                <input type="email" id="email" name="email" th:value="${order.orderAddress.email}" readonly style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #ced4da; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease; background-color: rgba(255, 255, 255, 0.9);">
+                            </div>
+                            <div style="flex: 0 0 50%; max-width: 50%; padding: 0 10px; margin-bottom: 1.5rem;">
+                                <label for="mobileNo" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #212529; font-size: 0.9rem; transition: all 0.3s ease;"><i class="fas fa-phone" style="color: #4361ee; margin-right: 0.5rem; font-size: 1.2rem;"></i>Mobile Number</label>
+                                <input type="text" id="mobileNo" name="mobileNo" th:value="${order.orderAddress.mobileNo}" readonly style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #ced4da; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease; background-color: rgba(255, 255, 255, 0.9);">
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; flex-wrap: wrap; margin: 0 -10px;">
+                            <div style="flex: 0 0 50%; max-width: 50%; padding: 0 10px; margin-bottom: 1.5rem;">
+                                <label for="address" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #212529; font-size: 0.9rem; transition: all 0.3s ease;"><i class="fas fa-home" style="color: #4361ee; margin-right: 0.5rem; font-size: 1.2rem;"></i>Address</label>
+                                <input type="text" id="address" name="address" th:value="${order.orderAddress.address}" readonly style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #ced4da; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease; background-color: rgba(255, 255, 255, 0.9);">
+                            </div>
+                            <div style="flex: 0 0 50%; max-width: 50%; padding: 0 10px; margin-bottom: 1.5rem;">
+                                <label for="city" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #212529; font-size: 0.9rem; transition: all 0.3s ease;"><i class="fas fa-city" style="color: #4361ee; margin-right: 0.5rem; font-size: 1.2rem;"></i>City</label>
+                                <input type="text" id="city" name="city" th:value="${order.orderAddress.city}" readonly style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #ced4da; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease; background-color: rgba(255, 255, 255, 0.9);">
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; flex-wrap: wrap; margin: 0 -10px;">
+                            <div style="flex: 0 0 50%; max-width: 50%; padding: 0 10px; margin-bottom: 1.5rem;">
+                                <label for="state" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #212529; font-size: 0.9rem; transition: all 0.3s ease;"><i class="fas fa-map-marker-alt" style="color: #4361ee; margin-right: 0.5rem; font-size: 1.2rem;"></i>State</label>
+                                <input type="text" id="state" name="state" th:value="${order.orderAddress.state}" readonly style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #ced4da; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease; background-color: rgba(255, 255, 255, 0.9);">
+                            </div>
+                            <div style="flex: 0 0 50%; max-width: 50%; padding: 0 10px; margin-bottom: 1.5rem;">
+                                <label for="pincode" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #212529; font-size: 0.9rem; transition: all 0.3s ease;"><i class="fas fa-map-pin" style="color: #4361ee; margin-right: 0.5rem; font-size: 1.2rem;"></i>Pincode</label>
+                                <input type="number" id="pincode" name="pincode" th:value="${order.orderAddress.pincode}" readonly style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #ced4da; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease; background-color: rgba(255, 255, 255, 0.9);">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="flex: 0 0 50%; max-width: 50%; padding: 0 15px;">
+					<div style="background-color: white; border-radius: 15px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); transition: all 0.3s ease; animation: slideInRight 0.6s ease-in-out;">
+					  
+					  <!-- Heading Section -->
+					  <h3 style="position: relative; color: #212529; font-weight: 700; margin-bottom: 0; text-align: center; font-size: 1.5rem; animation: slideInDown 0.6s ease-in-out;">
+					    Return Order Details
+					  </h3>
+
+					  <!-- Order Details Section -->
+					  <div style="display: flex;">
+					    <img th:src="@{'/img/product_img/' + ${order.product.image}}" 
+					      alt="Product Image" 
+					      style="width: 120px; height: 120px; object-fit: cover; border-radius: 10px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); transition: all 0.3s ease; animation: pulse 2s infinite;">
+					    
+					    <div style="margin-left: 1.5rem; flex: 1;">
+					      <p style="margin: 0.5rem 0; font-size: 1rem;">
+					        <strong><i class="fas fa-tag" style="color: #4361ee; margin-right: 0.5rem; font-size: 1.2rem;"></i>Name:</strong>
+					        <span th:text="${order.product.title}"></span>
+					      </p>
+					      <p style="margin: 0.5rem 0; font-size: 1rem;">
+					        <strong><i class="fas fa-info-circle" style="color: #4361ee; margin-right: 0.5rem; font-size: 1.2rem;"></i>Description:</strong>
+					        <span th:text="${order.product.description}"></span>
+					      </p>
+					      <p style="margin: 0.5rem 0; font-size: 1rem;">
+					        <strong><i class="fas fa-cubes" style="color: #4361ee; margin-right: 0.5rem; font-size: 1.2rem;"></i>Quantity:</strong>
+					        <span th:text="${order.quantity}"></span>
+					      </p>
+					      <p style="margin: 0.5rem 0; font-size: 1rem;">
+					        <strong><i class="fas fa-check-circle" style="color: #4361ee; margin-right: 0.5rem; font-size: 1.2rem;"></i>Status:</strong>
+					        <span th:text="${order.status}" style="display: inline-block; padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; line-height: 1; color: #fff; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: 0.5rem; background-color: #ff9e00;"></span>
+					      </p>
+					    </div>
+					  </div>
+					</div>
+
+                    
+                    <div style="background-color: white; border-radius: 15px; padding: 1.5rem; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); transition: all 0.3s ease; animation: slideInRight 0.8s ease-in-out;">
+                        <div style="margin-bottom: 1.5rem;">
+                            <label for="returnReason" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #212529; font-size: 0.9rem; transition: all 0.3s ease;"><i class="fas fa-question-circle" style="color: #4361ee; margin-right: 0.5rem; font-size: 1.2rem;"></i>Reason for Return</label>
+                            <select id="returnReason" name="returnReason" required style="appearance: none; background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\' fill=\'%23212529\' viewBox=\'0 0 16 16\'%3E%3Cpath d=\'M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z\'/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 16px 12px; width: 100%; padding: 0.75rem 1rem; border: 1px solid #ced4da; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease;">
+                                <option value="">Select Issue</option>
+                                <option value="damaged">Damaged or Missing Product</option>
+                                <option value="functional">Functional or Quality Issues</option>
+                                <option value="notAsDescribed">Item Not as Described</option>
+                            </select>
+                        </div>
+                        
+                        <div style="margin-bottom: 1.5rem;">
+                            <label for="comments" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #212529; font-size: 0.9rem; transition: all 0.3s ease;"><i class="fas fa-comment" style="color: #4361ee; margin-right: 0.5rem; font-size: 1.2rem;"></i>Comments</label>
+                            <textarea name="comments" id="comments" rows="3" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #ced4da; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease; background-color: rgba(255, 255, 255, 0.9);" placeholder="Provide additional details..."></textarea>
+                        </div>
+                        
+                        <div style="text-align: right; margin-top: 1.5rem;">
+                            <button type="button" class="btn-cancel" style="padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 600; font-size: 1rem; transition: all 0.3s ease; cursor: pointer; background-color: transparent; color: #212529; border: 1px solid #ced4da; margin-right: 12px;">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn-return" style="padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 600; font-size: 1rem; transition: all 0.3s ease; border: none; cursor: pointer; background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); color: white;">
+                                <i class="fas fa-undo"></i> Request Return
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideInDown {
+        from {
+            transform: translateY(-30px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideInUp {
+        from {
+            transform: translateY(30px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideInLeft {
+        from {
+            transform: translateX(-30px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideInRight {
+        from {
+            transform: translateX(30px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add animation when form is submitted
+        const form = document.getElementById('returnOrderForm');
+        const btnReturn = document.querySelector('.btn-return');
+        const btnCancel = document.querySelector('.btn-cancel');
+        
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                btnReturn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                btnReturn.disabled = true;
+                
+                // Allow the form to actually submit after a delay
+                setTimeout(() => {
+                    form.submit();
+                }, 1000);
+                
+                e.preventDefault();
+            });
+        }
+        
+        if (btnCancel) {
+            btnCancel.addEventListener('click', function() {
+                history.back();
+            });
+        }
+        
+        // Add animation to form fields when focused
+        const formControls = document.querySelectorAll('input, select, textarea');
+        formControls.forEach(control => {
+            control.addEventListener('focus', function() {
+                this.style.borderColor = '#4361ee';
+                this.style.boxShadow = '0 0 0 0.25rem rgba(67, 97, 238, 0.25)';
+                
+                const parentDiv = this.parentElement;
+                parentDiv.style.transform = 'translateY(-5px)';
+                parentDiv.style.transition = 'transform 0.3s ease';
+            });
+            
+            control.addEventListener('blur', function() {
+                this.style.borderColor = '#ced4da';
+                this.style.boxShadow = 'none';
+                
+                const parentDiv = this.parentElement;
+                parentDiv.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // Add hover effects to various elements
+        const hoverElements = [
+            {selector: '.btn-cancel', styles: {backgroundColor: '#f1f3f5', transform: 'translateY(-2px)'}},
+            {selector: '.btn-return', styles: {background: 'linear-gradient(135deg, #3f37c9 0%, #4361ee 100%)', transform: 'translateY(-2px)', boxShadow: '0 5px 15px rgba(67, 97, 238, 0.4)'}}
+        ];
+        
+        hoverElements.forEach(element => {
+            const els = document.querySelectorAll(element.selector);
+            els.forEach(el => {
+                const originalStyles = {};
+                Object.keys(element.styles).forEach(key => {
+                    originalStyles[key] = el.style[key];
+                });
+                
+                el.addEventListener('mouseenter', function() {
+                    Object.keys(element.styles).forEach(key => {
+                        el.style[key] = element.styles[key];
+                    });
+                });
+                
+                el.addEventListener('mouseleave', function() {
+                    Object.keys(originalStyles).forEach(key => {
+                        el.style[key] = originalStyles[key];
+                    });
+                });
+            });
+        });
+        
+        // Validate form before submission
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const returnReason = document.getElementById('returnReason');
+                
+                if (!returnReason.value) {
+                    e.preventDefault();
+                    returnReason.style.borderColor = '#ef233c';
+                    returnReason.style.animation = 'shake 0.5s ease-in-out';
+                    
+                    setTimeout(() => {
+                        returnReason.style.animation = '';
+                    }, 500);
+                }
+            });
+        }
+    });
+</script>
+</section>
+</body>
+</html>

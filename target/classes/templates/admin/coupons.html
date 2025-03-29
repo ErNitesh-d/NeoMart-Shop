@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{base::layout(~{::section},'Coupons')}">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Admin Index</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <section>
+        <div id="main-content" style="margin-left: 250px; padding: 20px; transition: margin-left 0.3s ease;">
+            <div class="row" style="margin-top: 5%;">
+                <!-- Coupon Details Section -->
+				<div class="col-md-12" >
+				    <div style="background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.07);  position: relative; overflow: hidden; animation: slideIn 0.8s ease forwards;">
+				        <!-- Background overlay effect -->
+				        <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, rgba(13,110,253,0.1), rgba(106,17,203,0.1)); transform: rotate(30deg); z-index: 1;"></div>
+				        
+				        <!-- Card Header -->
+				        <div style="background: transparent; border-bottom: 3px solid #0d6efd; text-align: center; padding-bottom: 20px; position: relative; z-index: 2;">
+				            <h2 style="font-size: 28px; color: #0d6efd; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 1px;">
+				                <i class="fas fa-ticket-alt" style="margin-right: 10px; margin-top: 15px;"></i>Coupon Details
+				            </h2>
+				            <th:block th:if="${session.succMsg}">
+				                <p style="color: #198754; font-weight: bold; margin-top: 10px; font-size: 16px; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 10px; box-shadow: 0 2px 10px rgba(25,135,84,0.2);">
+				                    <i class="fas fa-check-circle" style="margin-right: 8px;"></i>[[${session.succMsg}]]
+				                </p>
+				                <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+				            </th:block>
+				            <th:block th:if="${session.succMsg2}">
+				                <p style="color: #dc3545; font-weight: bold; margin-top: 10px; font-size: 16px; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 10px; box-shadow: 0 2px 10px rgba(220,53,69,0.2);">
+				                    <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>[[${session.succMsg2}]]
+				                </p>
+				                <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+				            </th:block>
+				        </div>
+				        
+						<div style=" position: relative; z-index: 2;">
+						    <table class="table" style="width: 100%; border-collapse: collapse; margin-bottom: 0; font-size: 13px;">
+						        <thead>
+						            <tr style="background: #e9ecef; color: #495057;">
+						                <th style="padding: 1px; text-align: center; font-weight: bold; border-bottom: 2px solid #dee2e6;">No.</th>
+						                <th style="padding: 1px; text-align: center; font-weight: bold; border-bottom: 2px solid #dee2e6;">Coupon Code</th>
+						                <th style="padding: 1px; text-align: center; font-weight: bold; border-bottom: 2px solid #dee2e6;">Name</th>
+						                <th style="padding: 1px; text-align: center; font-weight: bold; border-bottom: 2px solid #dee2e6;">Apply On</th>
+						                <th style="padding: 1px; text-align: center; font-weight: bold; border-bottom: 2px solid #dee2e6;">Category</th>
+						                <th style="padding: 1px; text-align: center; font-weight: bold; border-bottom: 2px solid #dee2e6;">Discount (%)</th>
+						                <th style="padding: 1px; text-align: center; font-weight: bold; border-bottom: 2px solid #dee2e6;">Min Purchase</th>
+						                <th style="padding: 1px; text-align: center; font-weight: bold; border-bottom: 2px solid #dee2e6;">Start Date</th>
+						                <th style="padding: 1px; text-align: center; font-weight: bold; border-bottom: 2px solid #dee2e6;">Expiry Date</th>
+						                <th style="padding: 1px; text-align: center; font-weight: bold; border-bottom: 2px solid #dee2e6;">Status</th>
+						                <th style="padding: 1px; text-align: center; font-weight: bold; border-bottom: 2px solid #dee2e6;">Action</th>
+						            </tr>
+						        </thead>
+						        <tbody>
+						            <tr th:each="cat, c : ${coupons}" style="transition: all 0.3s ease;" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='transparent'">
+						                <td style="padding: 1px; text-align: center; color: #495057; border-bottom: 1px solid #dee2e6;">[[${c.count}]]</td>
+						                <td style="padding: 1px; text-align: center; color: #495057; border-bottom: 1px solid #dee2e6;">[[${cat.code} ?: 'N/A']]</td>
+						                <td style="padding: 1px; text-align: center; color: #495057; border-bottom: 1px solid #dee2e6;">[[${cat.name} ?: 'N/A']]</td>
+						                <td style="padding: 1px; text-align: center; color: #495057; border-bottom: 1px solid #dee2e6;">[[${cat.applyOn} ?: 'N/A']]</td>
+						                <td style="padding: 1px; text-align: center; color: #495057; border-bottom: 1px solid #dee2e6;">[[${cat.category} ?: 'N/A']]</td>
+						                <td style="padding: 1px; text-align: center; color: #495057; border-bottom: 1px solid #dee2e6;">[[${cat.discount != null ? cat.discount + '%' : 'N/A'}]]</td>
+						                <td style="padding: 1px; text-align: center; color: #495057; border-bottom: 1px solid #dee2e6;">[[${cat.minAmount} ?: 'N/A']]</td>
+						                <td style="padding: 1px; text-align: center; color: #495057; border-bottom: 1px solid #dee2e6;">[[${cat.startDate}]]</td>
+						                <td style="padding: 1px; text-align: center; color: #495057; border-bottom: 1px solid #dee2e6;">[[${cat.expiryDate} ?: 'N/A']]</td>
+						                <td style="padding: 1px; text-align: center; border-bottom: 1px solid #dee2e6;">
+						                    <span th:text="${cat.status} ? 'TRUE' : 'FALSE'"
+						                        class="badge"
+						                        th:style="${cat.status} ? 'background: #28a745; color: white;' : 'background: #dc3545; color: white;'"
+						                        style="font-weight: bold; padding: 4px 8px; border-radius: 10px; font-size: 10px;">
+						                    </span>
+						                </td>
+						                <td style="padding: 8px; text-align: center; border-bottom: 1px solid #dee2e6;">
+						                    <a th:href="@{/admin/updateCouponsStatus(status=true, id=${cat.id}, pageNo=${pageNo})}" 
+						                        class="btn btn-primary btn-sm" 
+						                        style="background: #6a11cb; border: none; padding: 4px 8px; border-radius: 15px; color: white; transition: all 0.3s ease; margin-right: 3px; font-size: 10px;" 
+						                        onmouseover="this.style.background='#5a0fa9'" 
+						                        onmouseout="this.style.background='#6a11cb'">
+						                        <i class="fas fa-check" style="margin-right: 4px;"></i>Active
+						                    </a>
+						                    <a th:href="@{/admin/updateCouponsStatus(status=false, id=${cat.id}, pageNo=${pageNo})}" 
+						                        class="btn btn-danger btn-sm" 
+						                        style="background: #dc3545; border: none; padding: 4px 8px; border-radius: 15px; color: white; transition: all 0.3s ease; margin-right: 3px; font-size: 10px;" 
+						                        onmouseover="this.style.background='#c82333'" 
+						                        onmouseout="this.style.background='#dc3545'">
+						                        <i class="fas fa-times" style="margin-right: 4px;"></i>Deactivate
+						                    </a>
+						                    <a th:href="@{'/admin/loadEditCoupons/' + ${cat.id}}" 
+						                        class="btn btn-warning btn-sm" 
+						                        style="background: #ffc107; border: none; padding: 4px 8px; border-radius: 15px; color: white; transition: all 0.3s ease; font-size: 10px;" 
+						                        onmouseover="this.style.background='#e0a800'" 
+						                        onmouseout="this.style.background='#ffc107'">
+						                        <i class="fa-solid fa-pen-to-square" style="margin-right: 4px;"></i>Edit
+						                    </a>
+						                </td>
+						            </tr>
+						        </tbody>
+						    </table>
+
+						    <!-- Single Row for Total Coupons and Pagination -->
+						    <div class="row" style="padding: 0 15px; align-items: center;">
+						        <div class="col-md-6" style="font-size: 12px; color: #495057; padding: 8px 0;">
+						            Total Coupons: [[${totalElements}]]
+						        </div>
+						        <div class="col-md-6" style="padding: 8px 0;">
+						            <nav aria-label="Page navigation example">
+						                <ul class="pagination" style="justify-content: flex-end; margin: 0;">
+						                    <li class="page-item" th:classappend="${isFirst} ? 'disabled' : ''" 
+						                        style="margin-right: 3px;">
+						                        <a class="page-link" th:href="@{'/admin/coupons?pageNo=' + ${pageNo-1}}" aria-label="Previous" 
+						                            style="border-radius: 50%; padding: 4px 8px; color: #6a11cb; border: 1px solid #ced4da; transition: all 0.3s ease; font-size: 12px;" 
+						                            onmouseover="this.style.background='#e9ecef'" 
+						                            onmouseout="this.style.background='transparent'">
+						                            <span aria-hidden="true">«</span>
+						                        </a>
+						                    </li>
+						                    <li th:each="i:${#numbers.sequence(1,totalPages)}" class="page-item" 
+						                        th:classappend="${pageNo+1==i} ? 'active' : ''" 
+						                        style="margin-right: 3px;">
+												<a class="page-link" 
+												   th:href="@{'/admin/coupons?pageNo=' + ${i-1}}"
+												   th:style="${pageNo+1 == i} 
+												              ? 'border-radius: 8px; padding: 8px 12px; background: linear-gradient(135deg, #6a11cb, #2575fc); color: white; border: 1px solid #ced4da; transition: all 0.3s ease;' 
+												              : 'border-radius: 8px; padding: 8px 12px; background: transparent; color: #6a11cb; border: 1px solid #ced4da; transition: all 0.3s ease;'"
+												   th:onmouseover="${pageNo+1 == i} 
+												              ? 'this.style.background=`linear-gradient(135deg, #2575fc, #6a11cb)`' 
+												              : 'this.style.background=`#f1f3f5`'"
+												   th:onmouseout="${pageNo+1 == i} 
+												              ? 'this.style.background=`linear-gradient(135deg, #6a11cb, #2575fc)`' 
+												              : 'this.style.background=`transparent`'">
+												   [[${i}]]
+												</a>
+
+						                    </li>
+						                    <li class="page-item" th:classappend="${isLast} ? 'disabled' : ''" 
+						                        style="margin-right: 3px;">
+						                        <a class="page-link" th:href="@{'/admin/coupons?pageNo=' + ${pageNo+1}}" aria-label="Next" 
+						                            style="border-radius: 50%; padding: 4px 8px; color: #6a11cb; border: 1px solid #ced4da; transition: all 0.3s ease; font-size: 12px;" 
+						                            onmouseover="this.style.background='#e9ecef'" 
+						                            onmouseout="this.style.background='transparent'">
+						                            <span aria-hidden="true">»</span>
+						                        </a>
+						                    </li>
+						                </ul>
+						            </nav>
+						        </div>
+						    </div>
+						</div>
+				        </div>
+				    </div>
+				</div>
+
+
+
+            <!-- Add Coupons Section -->
+            <div class="row" style="margin-top: 5%;">
+                <div class="col-md-12" style="width: 100%; margin-left: 0%; padding: 20px;">
+                    <div style="background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.07); padding: 30px; position: relative; overflow: hidden; animation: slideIn 0.8s ease forwards;">
+                        <!-- Background overlay effect -->
+                        <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, rgba(13,110,253,0.1), rgba(106,17,203,0.1)); transform: rotate(30deg); z-index: 1;"></div>
+                        
+                        <!-- Card Header -->
+                        <div style="background: transparent; border-bottom: 3px solid #0d6efd; text-align: center; padding-bottom: 20px; position: relative; z-index: 2;">
+                            <h2 style="font-size: 28px; color: #0d6efd; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 1px;">
+                                <i class="fas fa-plus-circle" style="margin-right: 10px;"></i>Add Coupons
+                            </h2>
+                            <th:block th:if="${session.succMsg}">
+                                <p style="color: #198754; font-weight: bold; margin-top: 10px; font-size: 16px; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 10px; box-shadow: 0 2px 10px rgba(25,135,84,0.2);">
+                                    <i class="fas fa-check-circle" style="margin-right: 8px;"></i>[[${session.succMsg}]]
+                                </p>
+                                <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                            </th:block>
+                            <th:block th:if="${session.errorMsg}">
+                                <p style="color: #dc3545; font-weight: bold; margin-top: 10px; font-size: 16px; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 10px; box-shadow: 0 2px 10px rgba(220,53,69,0.2);">
+                                    <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>[[${session.errorMsg}]]
+                                </p>
+                                <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                            </th:block>
+                        </div>
+                        
+                        <!-- Card Body -->
+                        <div style="padding: 25px; position: relative; z-index: 2;">
+                            <form action="/admin/saveCoupons" id="couponForm" method="post" onsubmit="return updateApplyOn(event)">
+                                <div style="margin-bottom: 20px;">
+                                    <label style="font-weight: 600; color: #495057; margin-bottom: 8px; display: block;">
+                                        <i class="fas fa-ticket-alt" style="margin-right: 8px; color: #6a11cb;"></i>Enter Coupon Code
+                                    </label>
+                                    <input type="text" name="code" class="form-control" required 
+                                        style="border-radius: 12px; padding: 12px 15px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);" 
+                                        placeholder="Enter coupon code" 
+                                        onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'" 
+                                        onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='inset 0 1px 3px rgba(0,0,0,0.05)'">
+                                </div>
+
+                                <script>
+                                    document.addEventListener("DOMContentLoaded", function() {
+                                        function generateCouponCode() {
+                                            const randomPrefix = generateRandomString(2); 
+                                            const year = new Date().getFullYear();
+                                            const randomMiddle = generateRandomString(2);
+                                            const randomNumber = Math.floor(10 + Math.random() * 90);
+                                            return randomPrefix + year + randomMiddle + randomNumber;
+                                        }
+                                        function generateRandomString(length) {
+                                            const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                                            let result = "";
+                                            for (let i = 0; i < length; i++) {
+                                                result += characters.charAt(Math.floor(Math.random() * characters.length));
+                                            }
+                                            return result;
+                                        }
+                                        document.getElementsByName("code")[0].value = generateCouponCode();
+                                    });
+                                </script>
+
+                                <div style="margin-bottom: 20px;">
+                                    <label style="font-weight: 600; color: #495057; margin-bottom: 8px; display: block;">
+                                        <i class="fas fa-tag" style="margin-right: 8px; color: #6a11cb;"></i>Coupon Name
+                                    </label>
+                                    <input name="name" type="text" class="form-control" 
+                                        style="border-radius: 12px; padding: 12px 15px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);" 
+                                        placeholder="Enter coupon name" 
+                                        onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'" 
+                                        onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='inset 0 1px 3px rgba(0,0,0,0.05)'">
+                                </div>
+
+                                <div style="margin-bottom: 20px;">
+                                    <label style="font-weight: 600; color: #495057; margin-bottom: 8px; display: block;">
+                                        <i class="fas fa-percent" style="margin-right: 8px; color: #6a11cb;"></i>Discount Amount (%)
+                                    </label>
+                                    <input type="number" name="discount" class="form-control" required min="1" max="100" 
+                                        style="border-radius: 12px; padding: 12px 15px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);" 
+                                        placeholder="Enter discount percentage" 
+                                        onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'" 
+                                        onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='inset 0 1px 3px rgba(0,0,0,0.05)'">
+                                </div>
+
+                                <div style="margin-bottom: 20px;">
+                                    <label style="font-weight: 600; color: #495057; margin-bottom: 8px; display: block;">
+                                        <i class="fas fa-calendar-alt" style="margin-right: 8px; color: #6a11cb;"></i>Start Date
+                                    </label>
+                                    <input type="date" name="startDate" class="form-control" required 
+                                        style="border-radius: 12px; padding: 12px 15px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);" 
+                                        th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" 
+                                        onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'" 
+                                        onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='inset 0 1px 3px rgba(0,0,0,0.05)'">
+                                </div>
+
+                                <div style="margin-bottom: 20px;">
+                                    <label style="font-weight: 600; color: #495057; margin-bottom: 8px; display: block;">
+                                        <i class="fas fa-calendar-times" style="margin-right: 8px; color: #6a11cb;"></i>Expiry Date
+                                    </label>
+                                    <input type="date" name="expiryDate" class="form-control" required 
+                                        style="border-radius: 12px; padding: 12px 15px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);" 
+                                        placeholder="Select expiry date" 
+                                        onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'" 
+                                        onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='inset 0 1px 3px rgba(0,0,0,0.05)'">
+                                </div>
+
+                                <div style="margin-bottom: 20px;">
+                                    <label style="font-weight: 600; color: #495057; margin-bottom: 8px; display: block;">
+                                        <i class="fas fa-list" style="margin-right: 8px; color: #6a11cb;"></i>Apply On
+                                    </label>
+                                    <select name="applyOn" class="form-control" id="applyOnSelect" 
+                                        style="border-radius: 12px; padding: 12px 15px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);" 
+                                        onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'" 
+                                        onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='inset 0 1px 3px rgba(0,0,0,0.05)'">
+                                        <option value="ALL">All Products</option>
+                                        <option value="CATEGORY">Specific Category</option>
+                                        <option value="MIN_AMOUNT">Minimum Purchase Amount</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3" id="categoryWrapper" style="display: none; margin-bottom: 20px;">
+                                    <label id="categoryLabel" style="font-weight: 600; color: #495057; margin-bottom: 8px; display: block;">
+                                        <i class="fas fa-folder" style="margin-right: 8px; color: #6a11cb;"></i>Select Category
+                                    </label>
+                                    <select name="finalCategory" class="form-control" id="categorySelect" 
+                                        style="border-radius: 12px; padding: 12px 15px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);" 
+                                        onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'" 
+                                        onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='inset 0 1px 3px rgba(0,0,0,0.05)'">
+                                        <option value="Not Selected">Select Category</option>
+                                        <option value="ELECTRONICS">Electronics</option>
+                                        <option value="FURNITURE">Furniture</option>
+                                        <option value="CLOTHING">Clothing</option>
+                                        <option value="GROCERIES">Groceries</option>
+                                        <option value="BEAUTYCARE">Beauty Care</option>
+                                        <option value="SPORTSFITNESS">Sports & Fitness</option>
+                                        <option value="ACCESSORIES">Accessories</option>
+                                        <option value="TOYSGAMES">Toys & Games</option>
+                                        <option value="BOOKSSTATIONERY">Books & Stationery</option>
+                                        <option value="APPLIANCES">Home Appliances</option>
+                                    </select>
+                                </div>
+
+                                <div style="margin-bottom: 20px;">
+                                    <label style="font-weight: 600; color: #495057; margin-bottom: 8px; display: block;">
+                                        <i class="fas fa-money-bill" style="margin-right: 8px; color: #6a11cb;"></i>Minimum Purchase
+                                    </label>
+                                    <input type="number" name="minAmount" class="form-control" id="minAmountInput" required min="1" 
+                                        style="border-radius: 12px; padding: 12px 15px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);" 
+                                        placeholder="Enter minimum amount" 
+                                        onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'" 
+                                        onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='inset 0 1px 3px rgba(0,0,0,0.05)'">
+                                </div>
+
+                                <div style="margin-bottom: 20px;">
+                                    <label style="font-weight: 600; color: #495057; margin-bottom: 8px; display: block;">
+                                        <i class="fas fa-toggle-on" style="margin-right: 8px; color: #6a11cb;"></i>Status
+                                    </label>
+                                    <div class="form-check" style="margin-bottom: 10px;">
+                                        <input class="form-check-input" type="radio" checked value="true" name="status" id="active" 
+                                            style="margin-right: 8px;">
+                                        <label class="form-check-label" for="active" style="color: #495057;">Active</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="status" value="false" id="inactive" 
+                                            style="margin-right: 8px;">
+                                        <label class="form-check-label" for="inactive" style="color: #495057;">Inactive</label>
+                                    </div>
+                                </div>
+
+                                <button class="btn btn-primary col-md-12" type="submit" 
+                                    style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); border: none; padding: 14px; border-radius: 25px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; transition: all 0.4s ease; color: white;" 
+                                    onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(106,17,203,0.4)'" 
+                                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                                    <i class="fas fa-save" style="margin-right: 8px;"></i>Save Coupon
+                                </button>
+                            </form>
+
+                            <script>
+                                document.getElementById("applyOnSelect").addEventListener("change", function () {
+                                    let categoryWrapper = document.getElementById("categoryWrapper");
+                                    let categorySelect = document.getElementById("categorySelect");
+                                    if (this.value === "CATEGORY") {
+                                        categoryWrapper.style.display = "block";
+                                        categorySelect.setAttribute("required", "true");
+                                    } else {
+                                        categoryWrapper.style.display = "none";
+                                        categorySelect.removeAttribute("required");
+                                    }
+                                });
+
+                                function updateApplyOn(event) {
+                                    event.preventDefault();
+                                    let applyOnSelect = document.getElementById("applyOnSelect").value;
+                                    let categorySelect = document.getElementById("categorySelect").value;
+                                    let minAmountInput = document.getElementById("minAmountInput").value;
+
+                                    if (minAmountInput.trim() === "" || minAmountInput <= 0) {
+                                        alert("Minimum purchase amount is required and must be greater than 0.");
+                                        return false;
+                                    }
+
+                                    if (applyOnSelect === "CATEGORY") {
+                                        document.getElementsByName("finalCategory")[0].value = categorySelect;
+                                    } else {
+                                        document.getElementsByName("finalCategory")[0].value = "";
+                                    }
+                                    document.getElementById("couponForm").submit();
+                                }
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Animation Keyframes -->
+        <script>
+            const styleSheet = document.createElement('style');
+            styleSheet.textContent = `
+                @keyframes slideIn {
+                    from { opacity: 0; transform: translateY(30px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `;
+            document.head.appendChild(styleSheet);
+        </script>
+    </section>
+</body>
+</html>

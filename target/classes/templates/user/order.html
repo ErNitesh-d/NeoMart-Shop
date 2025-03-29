@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section},'Check Out')}">
+<head>
+<meta charset="ISO-8859-1">
+<title>Checkout</title>
+</head>
+<body>
+	<section>
+		<!-- Theme Toggle Button -->
+		<div class="theme-toggle-container" style="position: fixed; top: 80px; right: 20px; z-index: 1000;">
+			<button id="themeToggle" class="btn rounded-circle p-2" style="box-shadow: 0 0 10px rgba(0,0,0,0.2);">
+				<i id="themeIcon" class="fas fa-moon"></i>
+			</button>
+		</div>
+
+		<div class="container-fluid theme-container" id="checkoutContainer"
+			style="margin-top:5%; margin-bottom: 0%; width: 100%; border-radius: 15px; box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.15); padding: 25px; transition: all 0.3s ease;">
+			
+			<h2 class="text-center mb-4" style="font-weight: 700; color: var(--primary-color);">
+				<i class="fas fa-shopping-cart me-2"></i>Complete Your Purchase
+			</h2>
+			
+			<form action="/user/save-order" method="post" id="orders" novalidate>
+				<!-- Hidden input field to store Razorpay Payment ID -->
+				<input type="hidden" name="paymentId" id="paymentId" required>
+				<input type="hidden" name="couponId" id="couponId">
+				<input type="hidden" id="finalOrderPrice" name="finalOrderPrice" value="">
+
+				<div class="row">  
+					
+					<!-- Billing Address Section -->
+					<div class="col-md-6 mt-2">
+					    <div class="card-custom" style="padding: 25px; border-radius: 12px; box-shadow: 0px 0px 15px rgba(0,0,0,0.1); transition: all 0.3s ease;">
+					        <div class="d-flex align-items-center mb-3">
+					            <i class="fas fa-address-card me-2" style="font-size: 24px; color: var(--primary-color);"></i>
+					            <p class="text-center fs-4 mb-0" style="font-weight: bold; color: var(--primary-color);">Billing Address</p>
+					        </div>
+					        <hr>
+					        <div class="row">
+					            <div class="col-md-6 mb-3">
+					                <label><i class="fas fa-user me-2"></i>First Name</label>
+					                <input type="text" name="firstName" required class="form-control mt-1 input-custom" placeholder="Enter first name">
+					            </div>
+					            <div class="col-md-6 mb-3">
+					                <label><i class="fas fa-user me-2"></i>Last Name</label>
+					                <input type="text" name="lastName" required class="form-control mt-1 input-custom" placeholder="Enter last name">
+					            </div>
+					        </div>
+					        <div class="mb-3">
+					            <label><i class="fas fa-envelope me-2"></i>Email</label>
+					            <input type="email" name="email" required class="form-control input-custom" placeholder="Enter email">
+					        </div>
+					        <div class="mb-3">
+					            <label><i class="fas fa-phone me-2"></i>Mobile Number</label>
+					            <input type="text" name="mobileNo" required class="form-control input-custom" placeholder="Enter mobile number">
+					        </div>
+					        <div class="mb-3">
+					            <label><i class="fas fa-map-marker-alt me-2"></i>Address</label>
+					            <input type="text" name="address" required class="form-control input-custom" placeholder="Enter address">
+					        </div>
+					        <div class="row">
+					            <div class="col-md-4 mb-3">
+					                <label><i class="fas fa-city me-2"></i>City</label>
+					                <input type="text" name="city" required class="form-control input-custom" placeholder="Enter city">
+					            </div>
+					            <div class="col-md-4 mb-3">
+					                <label><i class="fas fa-map me-2"></i>State</label>
+					                <input type="text" name="state" required class="form-control input-custom" placeholder="Enter state">
+					            </div>
+					            <div class="col-md-4 mb-3">
+					                <label><i class="fas fa-map-pin me-2"></i>Pincode</label>
+					                <input type="number" name="pincode" required class="form-control input-custom" placeholder="Enter pincode">
+					            </div>
+					        </div>
+					    </div>
+
+					    <!-- Coupon Code Section (Placed Below Billing Address) -->
+					    <div class="card-custom mt-4" style="padding: 20px; border-radius: 12px; box-shadow: 0px 0px 15px rgba(0,0,0,0.1); transition: all 0.3s ease;">
+					        <div class="d-flex align-items-center mb-2">
+					            <i class="fas fa-ticket-alt me-2" style="font-size: 24px; color: var(--primary-color);"></i>
+					            <p class="fs-5 mb-0" style="font-weight: bold; color: var(--primary-color);">Apply Coupon Code</p>
+					        </div>
+					        <p id="couponMessage" class="mt-2" style="font-size: 16px; font-weight: 500; color: red; margin-bottom: 5px; margin-top: 0%;"></p>
+					        <div class="d-flex">
+					            <input type="text" id="couponCode" placeholder="Enter Coupon Code" class="form-control me-2 input-custom" style="flex: 1;">
+					            <button type="button" class="btn btn-primary" onclick="applyCoupon()">
+					                <i class="fas fa-check me-1"></i> Apply
+					            </button>
+					        </div>
+
+					        <div id="couponDetails" style="width: 100%; display: none; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); overflow: hidden; flex-direction: column; margin-top: 15px; padding: 15px; transition: all 0.3s ease;" class="coupon-card">
+					            <div style="display: flex; align-items: center;">
+					                <div id="discountValue" style="font-size: 40px; font-weight: bold; color: #FF6B6B; margin-right: 20px; line-height: 1;"></div>
+					                <div id="middleLine" style="display: none; width: 2px; height: 80px; margin: 0 20px;"></div>
+					                <div style="flex: 1;">
+					                    <div id="couponName" style="font-size: 20px; font-weight: 600; margin-bottom: 8px;"></div>
+					                    <div style="font-size: 16px;">
+					                        <p id="couponDescription" style="margin: 0;"></p>
+					                        <p id="expiryDate" style="font-size: 14px; font-weight: 600; margin-top: 8px; margin-bottom: 0;"></p>
+					                    </div>
+					                </div>
+					            </div>
+
+					            <!-- Apply Discount Button -->
+					            <div class="text-center" style="margin-top: 15px;">
+					                <button type="button" id="applyDiscountBtn" class="btn btn-primary" style="width: 100%; display: none;" onclick="applyDiscount()">
+					                    <i class="fas fa-tag me-1"></i> Apply Discount
+					                </button>
+					            </div>
+					        </div>
+					    </div>
+					</div>
+
+					<!-- Order Summary & Payment -->
+					<div class="col-md-6">
+						
+						<!-- Order Summary -->
+						<!-- Order Summary -->
+						<div class="card-custom" style="padding: 25px; border-radius: 12px; box-shadow: 0px 0px 15px rgba(0,0,0,0.1); transition: all 0.3s ease;">
+						    <div class="d-flex align-items-center mb-3">
+						        <i class="fas fa-clipboard-list me-2" style="font-size: 24px; color: var(--primary-color);"></i>
+						        <p class="text-center fs-4 mb-0" style="font-weight: bold; color: var(--primary-color);">Order Summary</p>
+						    </div>
+						    <div class="table-responsive">
+						        <table class="table table-custom">
+						            <thead>
+						                <tr>
+						                    <th>Product</th>
+						                    <th>Category</th>
+						                    <th>Price</th>
+						                    <th>Qty</th>
+						                    <th>Total</th>
+						                </tr>
+						            </thead>
+						            <tbody>
+						                <tr th:each="cart, iter : ${carts}" class="product-row">
+						                    <td th:text="${cart.product.title}" class="product-name"></td>
+						                    <td class="product-category">
+						                        <span th:text="${cart.product.category}"></span>
+						                    </td>
+						                    <td>
+						                        <span id="product-price-[[${iter.index}]]">
+						                            ₹ <span th:text="${cart.product.discountPrice}"></span>
+						                        </span>
+						                    </td>
+						                    <td class="product-qty" th:text="${cart.quantity}"></td>
+						                    <td>
+						                        <span th:id="'product-total-'+ ${iter.index}" >
+						                            ₹ <span th:text="${cart.quantity * cart.product.discountPrice}"></span>
+						                        </span>
+						                    </td>
+						                </tr>
+						                <tr class="border-top total-row " >
+						                    <td colspan="4" style="font-weight: bold;" class="total-text">Total Price :</td>
+						                    <td>
+						                        <span id="order-summary-total" class="total-summary-text">
+						                            ₹ <span id="total-price" th:text="${orderPrice}"></span>
+						                        </span>
+						                    </td>
+						                </tr>
+						            </tbody>
+						        </table>
+						    </div>
+						</div>
+
+						<!-- Payment Details -->
+						<div class="card-custom mt-4" style="padding: 25px; border-radius: 12px; box-shadow: 0px 0px 15px rgba(0,0,0,0.1); transition: all 0.3s ease;">
+						    <div class="d-flex align-items-center mb-3">
+						        <i class="fas fa-receipt me-2" style="font-size: 24px; color: var(--primary-color);"></i>
+						        <p class="text-center fs-4 mb-0" style="font-weight: bold; color: var(--primary-color);">Payment Details</p>
+						    </div>
+						    <table class="table table-borderless table-custom-payment">
+						        <tbody>
+						            <tr>
+						                <td><i class="fas fa-money-bill-wave me-2"></i>Total Price</td>
+						                <td>:</td>
+						                <td>₹ <span id="originalPrice">[[${orderPrice}]]</span></td>
+						            </tr>
+						            <tr>
+						                <td><i class="fas fa-truck me-2"></i>Delivery Fee</td>
+						                <td>:</td>
+						                <td>
+						                    <span class="badge free-delivery-badge" style="font-weight: bold; padding: 5px;">Free Delivery</span>
+						                </td>
+						            </tr>
+						            <tr>
+						                <td><i class="fas fa-percentage me-2"></i>Discount</td>
+						                <td>:</td>
+						                <td>₹ <span id="discountAmount" class="discount-text">0</span></td>
+						            </tr>
+						            <tr class="border-top total-row">
+						                <td class="final-text"><b><i class="fas fa-tag me-2 "></i>Final Price</b></td>
+						                <td>:</td>
+						                <td><b id="finalPrice" class="total-summary-text">₹ [[${orderPrice}]]</b></td>
+						            </tr>
+						        </tbody>
+						    </table>
+						</div>
+
+						<!-- Payment Type Selection -->
+						<div class="card-custom mt-4" style="padding: 25px; border-radius: 12px; box-shadow: 0px 0px 15px rgba(0,0,0,0.1); transition: all 0.3s ease;">
+							<div class="d-flex align-items-center mb-3">
+							    <i class="fas fa-credit-card me-2" style="font-size: 24px; color: var(--primary-color);"></i>
+							    <p class="text-center fs-4 mb-0" style="font-weight: bold; color: var(--primary-color);">Payment Method</p>
+							</div>
+							<div class="mb-4">
+								<div class="payment-method-container">
+									<div class="payment-option">
+										<input type="radio" id="cod" name="paymentType" value="COD" required>
+										<label for="cod" class="payment-label">
+											<i class="fas fa-hand-holding-usd me-2"></i>Cash On Delivery
+										</label>
+									</div>
+									<div class="payment-option">
+										<input type="radio" id="online" name="paymentType" value="ONLINE">
+										<label for="online" class="payment-label">
+											<i class="fas fa-credit-card me-2"></i>Online Payment
+										</label>
+									</div>
+								</div>
+							</div>
+
+							<!-- Place Order Button -->
+							<button id="placeOrderBtn" type="button" class="btn btn-primary w-100"
+								style="padding: 12px; font-size: 18px; font-weight: bold; border-radius: 8px; transition: all 0.2s ease;">
+								<i class="fas fa-shopping-cart me-2"></i>Place Order
+							</button>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<!-- Beautiful Animated Loader -->
+		<div id="loader" style="visibility: hidden; opacity: 0; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; flex-direction: column; z-index: 9999; color: white; font-family: Arial, sans-serif; transition: opacity 0.3s ease-in-out;">
+			<div class="spinner-border text-light" style="width: 4rem; height: 4rem;" role="status"></div>
+			<p id="loaderMessage" style="margin-top: 15px; font-size: 18px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);">
+				Confirming Your Order...
+			</p>
+		</div>
+
+		<!-- CSS for Theme Toggle -->
+		<style>
+			:root {
+				--primary-color: #007bff;
+				--secondary-color: #6c757d;
+				--background-color: #f8f9fa;
+				--text-color: #212529;
+				--border-color: #dee2e6;
+				--card-bg: #ffffff;
+				--input-bg: #ffffff;
+				--hover-color: #f1f3f5;
+				--shadow-color: rgba(0, 0, 0, 0.1);
+			}
+
+			.dark-theme {
+				--primary-color: #4dabf7;
+				--secondary-color: #adb5bd;
+				--background-color: #16213e ;
+				--text-color: #e9ecef;
+				--border-color: #495057;
+				--card-bg: #16213e ;
+				--input-bg: #16213e ;
+				--hover-color: #2d2d2d;
+				--shadow-color: rgba(0, 0, 0, 0.5);
+			}
+
+			body.dark-theme {
+				background-color: #121212;
+				color: #e9ecef;
+			}
+
+			.theme-container {
+				background-color: var(--background-color);
+				color: var(--text-color);
+				transition: all 0.3s ease;
+			}
+
+			.card-custom {
+				background-color: var(--card-bg);
+				border: 1px solid var(--border-color);
+				transition: all 0.3s ease;
+			}
+
+			.card-custom:hover {
+				box-shadow: 0 10px 20px var(--shadow-color);
+				transform: translateY(-5px);
+			}
+
+			.input-custom {
+				background-color: var(--input-bg);
+				color: var(--text-color);
+				border: 1px solid var(--border-color);
+				transition: all 0.3s ease;
+			}
+
+			.input-custom:focus {
+				box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+			}
+
+			.table-custom {
+				color: var(--text-color);
+			}
+
+			.table-custom thead th {
+				background-color: var(--card-bg);
+				border-color: var(--border-color);
+			}
+
+			.free-delivery-badge {
+				background: #ffd700;
+				color: #000;
+				transition: all 0.3s ease;
+			}
+
+			.dark-theme .free-delivery-badge {
+				background: #ffd700;
+				color: #000;
+			}
+
+			.payment-method-container {
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+			}
+
+			.payment-option {
+				display: flex;
+				align-items: center;
+			}
+
+			.payment-label {
+				display: flex;
+				align-items: center;
+				padding: 10px 15px;
+				margin-left: 10px;
+				border-radius: 8px;
+				cursor: pointer;
+				transition: all 0.2s ease;
+				background-color: var(--hover-color);
+				border: 1px solid var(--border-color);
+				flex-grow: 1;
+			}
+
+			.payment-option input[type="radio"] {
+				cursor: pointer;
+			}
+
+			.payment-option input[type="radio"]:checked + .payment-label {
+				background-color: var(--primary-color);
+				color: white;
+				border-color: var(--primary-color);
+			}
+
+			#themeToggle {
+				background-color: var(--card-bg);
+				color: var(--text-color);
+				border: 1px solid var(--border-color);
+				transition: all 0.3s ease;
+			}
+
+			#themeToggle:hover {
+				transform: rotate(30deg);
+			}
+
+			#couponDetails {
+				background-color: var(--card-bg);
+				border: 1px solid var(--border-color);
+			}
+
+			.btn-primary {
+				background-color: var(--primary-color);
+				border-color: var(--primary-color);
+				transition: all 0.3s ease;
+			}
+
+			.btn-primary:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+			}
+
+			/* Animated elements */
+			@keyframes fadeIn {
+				from { opacity: 0; transform: translateY(20px); }
+				to { opacity: 1; transform: translateY(0); }
+			}
+
+			.fade-in {
+				animation: fadeIn 0.5s ease forwards;
+			}
+			
+			/* Table Styling */
+			.table-custom {
+			    width: 100%;
+			    border-collapse: separate;
+			    border-spacing: 0;
+			    background-color: var(--card-bg);
+			    color: var(--text-color);
+			    transition: all 0.3s ease;
+			    border-radius: 8px;
+			    overflow: hidden;
+			}
+
+			.table-custom thead th {
+			    background-color: var(--primary-color);
+			    color: white;
+			    font-weight: 600;
+			    padding: 12px;
+			    text-align: left;
+			    border-bottom: 2px solid var(--border-color);
+			}
+
+			.table-custom tbody td {
+			    padding: 12px;
+			    border-bottom: 1px solid var(--border-color);
+			    vertical-align: middle;
+			}
+
+			.table-custom .product-row:hover {
+			    background-color: var(--hover-color);
+			    transition: background-color 0.2s ease;
+			}
+
+			/* Price and Total Text */
+			.price-text, .total-text {
+			    font-weight: 500;
+			    color: var(--text-color);
+			}
+
+			.total-row td {
+			    background-color: var(--card-bg);
+			    font-weight: bold;
+			}
+
+			.total-summary-text {
+			    font-size: 1.1rem;
+			    font-weight: 600;
+			    color: var(--primary-color);
+			}
+
+			/* Dark Mode Adjustments */
+			.dark-theme .table-custom {
+			    background-color: var(--card-bg);
+			    color: var(--text-color);
+			}
+
+			.dark-theme .table-custom thead th {
+			    background-color: var(--primary-color);
+			    color: white;
+			    border-bottom: 2px solid var(--border-color);
+			}
+
+			.dark-theme .table-custom tbody td {
+			    border-bottom: 1px solid var(--border-color);
+			}
+
+			.dark-theme .price-text, 
+			.dark-theme .total-text {
+			    color: #e9ecef; /* Light text for visibility in dark mode */
+			}
+			.dark-theme .final-text{
+				color: white;
+			}
+			.dark-theme .total-summary-text {
+			    color: var(--primary-color); /* Keep primary color for emphasis */
+			}
+
+			.dark-theme .product-row:hover {
+			    background-color: var(--hover-color); /* Slightly lighter hover effect in dark mode */
+			}
+
+			.dark-theme .total-row td {
+			    background-color: var(--card-bg);
+			}
+
+			/* Strikethrough and Discount Styling (for applyDiscount compatibility) */
+			.price-text del, .total-text del {
+			    color: #6c757d; /* Greyed out for strikethrough */
+			    margin-right: 5px;
+			}
+
+			.price-text b, .total-text b {
+			    color: #28a745; /* Green for discounted price */
+			}
+
+			/* Responsive Adjustments */
+			@media (max-width: 768px) {
+			    .table-custom th, .table-custom td {
+			        font-size: 0.9rem;
+			        padding: 8px;
+			    }
+			    .total-summary-text {
+			        font-size: 1rem;
+			    }
+			}
+			
+			
+			/* Payment Table Styling */
+			.table-custom-payment {
+			    width: 100%;
+			    background-color: var(--card-bg);
+			    color: var(--text-color);
+			    transition: all 0.3s ease;
+			    border-radius: 8px;
+			    overflow: hidden;
+			}
+
+			.table-custom-payment tbody td {
+			    padding: 10px;
+			    vertical-align: middle;
+			    border-bottom: 1px solid var(--border-color);
+			}
+
+			.table-custom-payment tr:last-child td {
+			    border-bottom: none; /* Remove border from last row */
+			}
+
+			.table-custom-payment .total-row td {
+			    background-color: var(--card-bg);
+			    font-weight: bold;
+			    padding-top: 15px;
+			}
+
+			/* Specific Text Styling */
+			.price-text, .discount-text {
+			    font-weight: 500;
+			    color: var(--text-color);
+			}
+
+			.total-summary-text {
+			    font-size: 1.1rem;
+			    font-weight: 600;
+				
+			    color: var(--primary-color);
+			}
+
+			.free-delivery-badge {
+			    background: #ffd700;
+			    color: #000;
+			    font-weight: bold;
+			    padding: 5px 10px;
+			    border-radius: 4px;
+			    transition: all 0.3s ease;
+			}
+
+			/* Dark Mode Adjustments */
+			.dark-theme .table-custom-payment {
+			    background-color: var(--card-bg);
+			    color: var(--text-color);
+			}
+
+		
+			.dark-theme .table-custom-payment tbody td {
+			    border-bottom: 1px solid var(--border-color);
+			}
+
+			.dark-theme .price-text, 
+			.dark-theme .discount-text {
+			    color: #e9ecef; /* Light text for visibility in dark mode */
+			}
+
+			.dark-theme .total-summary-text {
+			    color: var(--primary-color); /* Maintain primary color for emphasis */
+			}
+
+			.dark-theme .total-row td {
+			    background-color: var(--card-bg);
+			}
+
+			.dark-theme .free-delivery-badge {
+			    background: #ffd700;
+			    color: #000; /* Keep black text on yellow for contrast */
+			}
+
+			/* Hover Effect */
+			.table-custom-payment tr:hover {
+			    background-color: var(--hover-color);
+			    transition: background-color 0.2s ease;
+			}
+
+			/* Strikethrough and Discount Styling (for applyDiscount compatibility) */
+			.total-summary-text del {
+			    color: #6c757d; /* Greyed out for strikethrough */
+			    margin-right: 5px;
+			}
+
+			.total-summary-text b {
+			    color: #28a745; /* Green for discounted price */
+			}
+
+			/* Responsive Adjustments */
+			@media (max-width: 768px) {
+			    .table-custom-payment td {
+			        font-size: 0.9rem;
+			        padding: 8px;
+			    }
+			    .total-summary-text {
+			        font-size: 1rem;
+			    }
+			}
+		</style>
+
+		<!-- Razorpay Script -->
+		<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+		<!-- Theme Toggle Script -->
+		<script>
+			document.addEventListener("DOMContentLoaded", function () {
+				// Theme Toggle Functionality
+				const themeToggle = document.getElementById("themeToggle");
+				const themeIcon = document.getElementById("themeIcon");
+				const body = document.body;
+				const container = document.getElementById("checkoutContainer");
+
+				// Check for saved theme preference
+				const savedTheme = localStorage.getItem("theme");
+				if (savedTheme === "dark") {
+					body.classList.add("dark-theme");
+					themeIcon.className = "fas fa-sun";
+				}
+
+				// Theme toggle button click event
+				themeToggle.addEventListener("click", function() {
+					body.classList.toggle("dark-theme");
+					
+					if (body.classList.contains("dark-theme")) {
+						themeIcon.className = "fas fa-sun";
+						localStorage.setItem("theme", "dark");
+					} else {
+						themeIcon.className = "fas fa-moon";
+						localStorage.setItem("theme", "light");
+					}
+				});
+
+				// Add fade-in animation to elements
+				const elements = document.querySelectorAll(".card-custom");
+				elements.forEach((element, index) => {
+					element.classList.add("fade-in");
+					element.style.animationDelay = `${index * 0.1}s`;
+				});
+
+				// Existing Order Processing Logic
+				const placeOrderButton = document.getElementById("placeOrderBtn");
+				const paymentTypeRadios = document.querySelectorAll("input[name='paymentType']");
+				const orderForm = document.getElementById("orders");
+				const loader = document.getElementById("loader");
+				const loaderMessage = document.getElementById("loaderMessage");
+
+				// Hide loader when page loads
+				loader.style.display = "none";
+
+				placeOrderButton.addEventListener("click", function (event) {
+					event.preventDefault(); // Prevent form submission
+
+					// Get selected payment type
+					let paymentType = "";
+					paymentTypeRadios.forEach(radio => {
+						if (radio.checked) {
+							paymentType = radio.value;
+						}
+					});
+					
+	
+					
+					if (paymentType === "COD") {
+						loaderMessage.innerText = "Confirming Your Order...";
+						showLoader();
+						setTimeout(() => { 
+							orderForm.submit(); // Submit form after 1 second
+						}, 1000);
+					} else if (paymentType === "ONLINE") {
+						initiateRazorpayPayment(); // Call Razorpay function for online payment
+					} else {
+						alert("Please select a payment option.");
+					}
+				});
+
+				function showLoader() {
+					loader.style.display = "flex";
+					loader.style.visibility = "visible";
+					loader.style.opacity = "1";
+				}
+
+				function hideLoader() {
+					loader.style.display = "none";
+					loader.style.visibility = "hidden";
+					loader.style.opacity = "0";
+				}
+
+				function initiateRazorpayPayment() {
+					showLoader();
+					let totalAmount = document.getElementById("finalPrice").innerText.replace('₹', '').trim();
+					
+					// If there's a strikethrough price (discount applied), get the actual price
+					if (totalAmount.includes('₹')) {
+						totalAmount = totalAmount.split('₹')[1].trim();
+					}
+
+					let products = [];
+					document.querySelectorAll(".product-row").forEach((row) => {
+						let productName = row.querySelector(".product-name")?.innerText.trim() || "Unknown Product";
+						let quantity = row.querySelector(".product-qty")?.innerText.trim() || "1";
+						if (productName && quantity) {
+							products.push(`${productName} (Qty: ${quantity})`);
+						}
+					});
+
+					let productDetails = products.length ? products.join(", ") : "No product details available";
+					if (productDetails.length > 255) {
+						productDetails = productDetails.substring(0, 252) + "...";
+					}
+
+					let options = {
+						"key": "rzp_test_M8Xhr4kSJacQBr",
+						"amount": parseFloat(totalAmount) * 100,
+						"currency": "INR",
+						"name": "NeoMart",
+						"description": productDetails,
+						"image": "/img/newlogo.png",
+						"handler": function (response) {
+							document.getElementById("paymentId").value = response.razorpay_payment_id;
+
+							if (!document.getElementById("paymentId").value) {
+								alert("Error: Payment ID not set!");
+								hideLoader();
+								return;
+							}
+
+							// Show "Payment Successful" message before submitting
+							loaderMessage.innerText = "Payment Successful! Confirming Your Order...";
+							
+							setTimeout(() => {
+								orderForm.submit();
+							}, 1500);
+						},
+						"prefill": {
+							"name": document.querySelector("input[name='firstName']").value + " " + document.querySelector("input[name='lastName']").value,
+							"email": document.querySelector("input[name='email']").value,
+							"contact": document.querySelector("input[name='mobileNo']").value
+						},
+						"theme": {
+							"color": "#007bff"
+						}
+					};
+
+					let rzp = new Razorpay(options);
+					rzp.open();
+				}
+			});
+		</script>
+
+		<!-- Coupon Functions -->
+		<script>
+			function applyCoupon() {
+				let couponCode = document.getElementById("couponCode").value.trim();
+				let couponMessage = document.getElementById("couponMessage");
+				let couponDetails = document.getElementById("couponDetails");
+
+				if (couponCode === "") {
+					couponMessage.innerText = "⚠️ Please enter a coupon code!";
+					couponMessage.style.color = "red";
+					couponDetails.style.display = "none";
+					return;
+				}
+
+				// Show loading animation
+				couponMessage.innerText = "Checking coupon...";
+				couponMessage.style.color = "var(--text-color)";
+
+				fetch(`/user/orders/coupon/${encodeURIComponent(couponCode)}`)
+					.then(response => response.json())
+					.then(data => {
+						if (data.valid) {
+							let discount = data.discount || 0;
+							let name = data.name || "Unknown Coupon";
+							let applyOn = data.applyOn || "All Products";
+							let id = data.id || 0;
+							let minAmount = data.minAmount || 0;
+							let expiryDate = data.expiryDate || "No Expiry Date";
+							let customMessage = data.customMessage || `✅ Coupon Is Valid! You will get ${discount}% discount.`;
+
+							// Update UI with coupon details
+							couponMessage.innerText = customMessage;
+							couponMessage.style.color = "green";
+
+							document.getElementById("discountValue").innerHTML = `${discount}% <span style="font-size: 24px; vertical-align: super;">OFF</span>`;
+							document.getElementById("couponName").innerText = `DISCOUNT COUPON ${name}`;
+							document.getElementById("couponDescription").innerText = `Applies On ${applyOn}, For Minimum Purchase Amount: ₹${minAmount}`;
+							document.getElementById("expiryDate").innerText = `Valid until: ${expiryDate}`;
+
+							document.getElementById("couponId").value = data.id || 0;
+							
+							couponDetails.style.display = "flex";
+							document.getElementById("applyDiscountBtn").style.display = "block";
+							document.getElementById("applyDiscountBtn").setAttribute("data-discount", discount);
+							document.getElementById("applyDiscountBtn").setAttribute("data-applyOn", applyOn);
+							document.getElementById("applyDiscountBtn").setAttribute("data-minAmount", minAmount);
+							
+							// Added animation for coupon card
+							couponDetails.classList.add("fade-in");
+
+						} else {
+							couponMessage.innerText = data.message || "❌ Invalid Coupon!";
+							couponMessage.style.color = "red";
+							couponDetails.style.display = "none";
+							document.getElementById("applyDiscountBtn").style.display = "none";
+						}
+					})
+					.catch(error => {
+						console.error("Error:", error);
+						couponMessage.innerText = "❌ Error in applying coupon.";
+						couponMessage.style.color = "red";
+						couponDetails.style.display = "none";
+						document.getElementById("applyDiscountBtn").style.display = "none";
+					});
+			}
+			
+	
+function applyDiscount() {
+                let categoryElements2 = document.querySelectorAll(".product-category");    
+                let applyOn = document.getElementById("applyDiscountBtn").getAttribute("data-applyOn");
+                let couponMessage = document.getElementById("couponMessage");
+                
+                // Convert NodeList to an array and check if any category matches `applyOn`
+                let categoryMatch = applyOn === "All Products" || Array.from(categoryElements2).some(element => 
+                    element.textContent.trim().toUpperCase() === applyOn.toUpperCase()
+                );
+
+                if (categoryMatch) {
+                    let totalPrices = document.querySelectorAll("span[id^='product-total-']");
+                    let priceArray = [];
+                    totalPrices.forEach(span => {
+                        let price = parseFloat(span.innerText.trim().replace('₹', '').trim());
+                        priceArray.push(price);
+                    });
+                    
+                    let totalPrice = parseFloat(document.getElementById("total-price").innerText.trim());
+                    let minAmount = parseFloat(document.getElementById("applyDiscountBtn").getAttribute("data-minAmount"));
+                    let allAboveMinAmount = priceArray.every(price => price >= minAmount);
+                        
+                    if (totalPrice >= minAmount && allAboveMinAmount) {
+                        let discount = parseFloat(document.getElementById("applyDiscountBtn").getAttribute("data-discount"));
+                        let priceElements = document.querySelectorAll("[id^='product-price-']");
+                        let totalElements = document.querySelectorAll("[id^='product-total-']");
+                        let qtyElements = document.querySelectorAll(".product-qty");
+                        let categoryElements = document.querySelectorAll(".product-category");
+                        let totalOrderPrice = 0;
+                        
+                        if (applyOn === "All Products" || applyOn === "MIN_AMOUNT") {
+                            priceElements.forEach((priceElement, index) => {
+                                let priceText = priceElement.innerText.replace("₹", "").trim();
+                                let productOriginalPrice = parseFloat(priceText);
+                                let quantity = parseInt(qtyElements[index].innerText.trim());
+
+                                if (!isNaN(productOriginalPrice) && !isNaN(quantity)) {
+                                    let productNewPrice = productOriginalPrice - (productOriginalPrice * discount / 100);
+                                    let newTotalPrice = productNewPrice * quantity;
+
+                                    priceElement.innerHTML = `<del>₹ ${productOriginalPrice.toFixed(2)}</del> <b style="color: #28a745;">₹ ${productNewPrice.toFixed(2)}</b>`;
+                                    totalElements[index].innerHTML = `<del>₹ ${(productOriginalPrice * quantity).toFixed(2)}</del> <b style="color: #28a745;">₹ ${newTotalPrice.toFixed(2)}</b>`;
+
+                                    totalOrderPrice += newTotalPrice;
+                                }
+                            });
+                        } else if (typeof applyOn === "string" && applyOn.trim() !== "") {
+                            let minLength = Math.min(priceElements.length, totalElements.length, qtyElements.length, categoryElements.length);
+
+                            for (let index = 0; index < minLength; index++) {
+                                let productCategory = categoryElements[index]?.innerText?.trim() || "";
+                                let priceText = priceElements[index]?.innerText.replace("₹", "").trim() || "0";
+                                let productOriginalPrice = parseFloat(priceText);
+                                let quantity = parseInt(qtyElements[index]?.innerText.trim() || "0");
+
+                                if (!isNaN(productOriginalPrice) && !isNaN(quantity) && productCategory.toLowerCase() === applyOn.toLowerCase()) {
+                                    let productNewPrice = productOriginalPrice - (productOriginalPrice * discount / 100);
+                                    let newTotalPrice = productNewPrice * quantity;
+
+                                    priceElements[index].innerHTML = `<del>₹ ${productOriginalPrice.toFixed(2)}</del> <b style="color: #28a745;">₹ ${productNewPrice.toFixed(2)}</b>`;
+                                    totalElements[index].innerHTML = `<del>₹ ${(productOriginalPrice * quantity).toFixed(2)}</del> <b style="color: #28a745;">₹ ${newTotalPrice.toFixed(2)}</b>`;
+
+                                    totalOrderPrice += newTotalPrice;
+                                } else {
+                                    totalOrderPrice += productOriginalPrice * quantity; // Keep original price if category doesn't match
+                                }
+                            }
+                        }
+
+                        // Update Order Summary Total
+                        let orderSummaryTotalElement = document.getElementById("order-summary-total");
+                        let originalOrderPrice = parseFloat(orderSummaryTotalElement.innerText.replace("₹", "").trim());
+                        let discountAmount = originalOrderPrice - totalOrderPrice;
+
+                        if (!isNaN(originalOrderPrice)) {
+                            orderSummaryTotalElement.innerHTML = `<del>₹ ${originalOrderPrice.toFixed(2)}</del> <b style="color: #28a745;">₹ ${totalOrderPrice.toFixed(2)}</b>`;
+                        }
+
+                        // Update Payment Details
+                        let originalPriceElement = document.getElementById("originalPrice");
+                        let discountAmountElement = document.getElementById("discountAmount");
+                        let finalPriceElement = document.getElementById("finalPrice");
+
+                        if (!isNaN(originalOrderPrice)) {
+                            discountAmountElement.innerText = discountAmount.toFixed(2);
+                            finalPriceElement.innerHTML = `<b>₹ ${totalOrderPrice.toFixed(2)}</b>`;
+                        }
+
+                        // Update Hidden Input for Final Price
+                        document.getElementById("finalOrderPrice").value = totalOrderPrice.toFixed(2);
+
+                        // Success Animation
+                        orderSummaryTotalElement.classList.add("fade-in");
+                        couponMessage.innerText = "✅ Discount Applied Successfully!";
+                        couponMessage.style.color = "#28a745";
+                    } else {
+                        couponMessage.innerText = `⚠️ You need to purchase at least ₹${minAmount} to apply this discount.`;
+                        couponMessage.style.color = "red";
+                    }
+                } else {
+                    couponMessage.innerText = `❌ Buy product from "${applyOn}" category to use this coupon.`;
+                    couponMessage.style.color = "red";
+                }
+            }
+        </script>
+
+        <!-- Include FontAwesome for Icons -->
+        <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+    </section>
+</body>
+</html>

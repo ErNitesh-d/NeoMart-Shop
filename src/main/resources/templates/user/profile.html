@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section},'Profile')}">
+<head>
+  <meta charset="ISO-8859-1">
+  <title>User Profile</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+	<section>
+		<div style=" transition: all 0.3s ease; padding: 0rem; border-radius: 12px; margin-top: 2rem;" class="theme-container" id="themeContainer">
+			
+			
+			<div style="background-color: #fff; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); padding: 2rem; transition: all 0.3s ease;" class="content-card" id="contentCard">
+				<!-- Profile Header -->
+				<div style="text-align: center; margin-bottom: 2rem;">
+					<div style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 2%; margin-bottom: 1.5rem;">
+					    <!-- Title in Center -->
+					    <h2 style="font-size: 2rem; font-weight: 500; color: #4361ee; flex: 1; text-align: center; margin: 0;">
+					        My Profile
+					    </h2>
+					    
+					    <!-- Theme Toggle Button -->
+					    <button id="themeToggle" style="border: none; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: all 0.3s ease; margin-left: auto;" aria-label="Toggle theme">
+					        <i class="fas fa-moon" style="font-size: 1.2rem;"></i>
+					    </button>
+					</div>
+
+					<!-- Success Message -->
+					<th:block th:if="${session.succMsg}">
+						<div style="background-color: rgba(25, 135, 84, 0.1); color: #198754; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; font-weight: 500;">
+							<i class="fas fa-check-circle" style="margin-right: 0.5rem;"></i>
+							<span>[[${session.succMsg}]]</span>
+						</div>
+						<th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+					</th:block>
+					
+					<!-- Error Message -->
+					<th:block th:if="${session.errorMsg}">
+						<div style="background-color: rgba(220, 53, 69, 0.1); color: #dc3545; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; font-weight: 500;">
+							<i class="fas fa-exclamation-circle" style="margin-right: 0.5rem;"></i>
+							<span>[[${session.errorMsg}]]</span>
+						</div>
+						<th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+					</th:block>
+					
+					<hr style="margin: 1.5rem 0; opacity: 0.15;">
+					
+					<!-- Profile Image -->
+					<div style="margin-bottom: 2rem;">
+						<div style="width: 120px; height: 120px; border-radius: 50%; margin: 0 auto; position: relative; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 4px solid #fff;">
+							<img alt="Profile" th:src="@{'../img/profile_img/'+${user.profleImage}}" style="width: 100%; height: 100%; object-fit: cover;">
+						</div>
+					</div>
+				</div>
+				
+				<!-- Profile Information Form -->
+				<div style="max-width: 700px; margin: 0 auto;">
+					<form action="/user/update-profile" method="post" enctype="multipart/form-data" style="margin-bottom: 2rem;">
+						<div style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
+							<!-- Name Field -->
+							<div style="display: flex; flex-direction: column;">
+								<label style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;" class="form-label">Name</label>
+								<div style="position: relative;">
+									<i class="fas fa-user" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+									<input type="text" name="name" th:value="${user.name}" style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.5rem; border-radius: 8px; border: 1px solid #dee2e6; font-size: 1rem; transition: all 0.3s ease;" class="form-input">
+								</div>
+							</div>
+							
+							<!-- Mobile Number Field -->
+							<div style="display: flex; flex-direction: column;">
+								<label style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;" class="form-label">Mobile Number</label>
+								<div style="position: relative;">
+									<i class="fas fa-phone" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+									<input type="text" name="mobileNumber" th:value="${user.mobileNumber}" style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.5rem; border-radius: 8px; border: 1px solid #dee2e6; font-size: 1rem; transition: all 0.3s ease;" class="form-input">
+								</div>
+							</div>
+							
+							<!-- Email Field -->
+							<div style="display: flex; flex-direction: column;">
+								<label style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;" class="form-label">Email</label>
+								<div style="position: relative;">
+									<i class="fas fa-envelope" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+									<input type="text" name="" th:value="${user.email}" readonly style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.5rem; border-radius: 8px; border: 1px solid #dee2e6; font-size: 1rem; transition: all 0.3s ease; background-color: #f8f9fa;" class="form-input">
+								</div>
+							</div>
+							
+							<!-- Address Field -->
+							<div style="display: flex; flex-direction: column;">
+								<label style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;" class="form-label">Address</label>
+								<div style="position: relative;">
+									<i class="fas fa-map-marker-alt" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+									<input type="text" name="address" th:value="${user.address}" style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.5rem; border-radius: 8px; border: 1px solid #dee2e6; font-size: 1rem; transition: all 0.3s ease;" class="form-input">
+								</div>
+							</div>
+							
+							<!-- Row for City, State, Pincode -->
+							<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+								<!-- City Field -->
+								<div style="display: flex; flex-direction: column;">
+									<label style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;" class="form-label">City</label>
+									<div style="position: relative;">
+										<i class="fas fa-city" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+										<input type="text" name="city" th:value="${user.city}" style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.5rem; border-radius: 8px; border: 1px solid #dee2e6; font-size: 1rem; transition: all 0.3s ease;" class="form-input">
+									</div>
+								</div>
+								
+								<!-- State Field -->
+								<div style="display: flex; flex-direction: column;">
+									<label style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;" class="form-label">State</label>
+									<div style="position: relative;">
+										<i class="fas fa-map" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+										<input type="text" name="state" th:value="${user.state}" style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.5rem; border-radius: 8px; border: 1px solid #dee2e6; font-size: 1rem; transition: all 0.3s ease;" class="form-input">
+									</div>
+								</div>
+								
+								<!-- Pincode Field -->
+								<div style="display: flex; flex-direction: column;">
+									<label style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;" class="form-label">Pincode</label>
+									<div style="position: relative;">
+										<i class="fas fa-location-arrow" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+										<input type="text" name="pincode" th:value="${user.pincode}" style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.5rem; border-radius: 8px; border: 1px solid #dee2e6; font-size: 1rem; transition: all 0.3s ease;" class="form-input">
+									</div>
+								</div>
+							</div>
+							
+							<!-- Image Field -->
+							<div style="display: flex; flex-direction: column;">
+								<label style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;" class="form-label">Profile Image</label>
+								<div style="position: relative;">
+									<label style="display: flex; align-items: center; gap: 10px; padding: 0.75rem 1rem; border-radius: 8px; border: 1px dashed #dee2e6; background-color: #f8f9fa; cursor: pointer; transition: all 0.3s ease;" class="file-label">
+										<i class="fas fa-cloud-upload-alt" style="color: #6c757d; font-size: 1.2rem;"></i>
+										<span id="fileName">Choose file</span>
+										<input type="file" name="img" style="position: absolute; opacity: 0; width: 0; height: 0;" class="file-input" id="fileInput">
+									</label>
+								</div>
+							</div>
+							
+							<!-- Row for Role and Account Status -->
+							<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+								<!-- Role Field -->
+								<div style="display: flex; flex-direction: column;">
+									<label style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;" class="form-label">Role</label>
+									<div style="position: relative;">
+										<i class="fas fa-user-tag" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+										<input type="text" name="" th:value="${user.role}" readonly style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.5rem; border-radius: 8px; border: 1px solid #dee2e6; font-size: 1rem; transition: all 0.3s ease; background-color: #f8f9fa;" class="form-input">
+									</div>
+								</div>
+								
+								<!-- Account Status Field -->
+								<div style="display: flex; flex-direction: column;">
+									<label style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;" class="form-label">Account Status</label>
+									<div style="position: relative;">
+										<i class="fas fa-shield-alt" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+										<input type="text" name="" th:value="${user.isEnabled}" readonly style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.5rem; border-radius: 8px; border: 1px solid #dee2e6; font-size: 1rem; transition: all 0.3s ease; background-color: #f8f9fa;" class="form-input">
+										<input type="hidden" th:value="${user.id}" name="id">
+									</div>
+								</div>
+							</div>
+							
+							<!-- Update Button -->
+							<div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+								<button type="submit" style="background-color: #4361ee; color: white; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s ease;" class="submit-btn">
+									<i class="fas fa-save"></i>
+									Update Profile
+								</button>
+							</div>
+						</div>
+					</form>
+					
+					<hr style="margin: 2rem 0; opacity: 0.15;">
+					
+					<!-- Change Password Section -->
+					<div style="margin-top: 2rem;">
+						<h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1.5rem; text-align: center; color: #4361ee;">Change Password</h3>
+						
+						<form action="/user/change-password" method="post" style="max-width: 600px; margin: 0 auto;">
+							<div style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
+								<!-- Current Password Field -->
+								<div style="display: flex; flex-direction: column;">
+									<label style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;" class="form-label">Current Password</label>
+									<div style="position: relative;">
+										<i class="fas fa-lock" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+										<input type="password" name="oldPassword" style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.5rem; border-radius: 8px; border: 1px solid #dee2e6; font-size: 1rem; transition: all 0.3s ease;" class="form-input" required>
+									</div>
+								</div>
+								
+								<!-- New Password Field -->
+								<div style="display: flex; flex-direction: column;">
+									<label style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;" class="form-label">New Password</label>
+									<div style="position: relative;">
+										<i class="fas fa-key" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+										<input type="password" name="newPassword" style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.5rem; border-radius: 8px; border: 1px solid #dee2e6; font-size: 1rem; transition: all 0.3s ease;" class="form-input" required>
+									</div>
+								</div>
+								
+								<!-- Confirm New Password Field -->
+								<div style="display: flex; flex-direction: column;">
+									<label style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;" class="form-label">Confirm New Password</label>
+									<div style="position: relative;">
+										<i class="fas fa-key" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+										<input type="password" name="confirmPassword" style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.5rem; border-radius: 8px; border: 1px solid #dee2e6; font-size: 1rem; transition: all 0.3s ease;" class="form-input" required>
+										<input type="hidden" th:value="${user.id}" name="id">
+									</div>
+								</div>
+								
+								<!-- Change Password Button -->
+								<div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+									<button type="submit" style="background-color: #4361ee; color: white; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s ease;" class="submit-btn">
+										<i class="fas fa-lock"></i>
+										Change Password
+									</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<script>
+		    document.addEventListener("DOMContentLoaded", function () {
+		        const themeToggle = document.getElementById('themeToggle');
+		        const themeContainer = document.getElementById('themeContainer');
+		        const contentCard = document.getElementById('contentCard');
+		        const moonIcon = themeToggle.querySelector('i');
+
+		        // 🔹 Check for saved theme preference
+		        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+		        // 🔹 Apply dark mode if previously enabled
+		        if (isDarkMode) {
+		            enableDarkMode();
+		        }
+
+		        // 🔹 Add event listener for theme toggle button
+		        themeToggle.addEventListener('click', () => {
+		            if (document.body.classList.contains('dark-mode')) {
+		                disableDarkMode();
+		                localStorage.setItem('darkMode', 'false');
+		            } else {
+		                enableDarkMode();
+		                localStorage.setItem('darkMode', 'true');
+		            }
+		        });
+
+		        function enableDarkMode() {
+		            document.body.classList.add('dark-mode');
+		            themeContainer.style.backgroundColor = '#1a1a2e';
+		            contentCard.style.backgroundColor = '#16213e';
+		            contentCard.style.color = '#fff';
+		            themeToggle.style.backgroundColor = '#293b5f';
+		            moonIcon.classList.replace('fa-moon', 'fa-sun');
+		            moonIcon.style.color = '#ffd460';
+
+		            // Update form inputs for dark mode
+		            document.querySelectorAll('.form-input').forEach(input => {
+		                input.style.backgroundColor = '#293b5f';
+		                input.style.borderColor = '#3d5a80';
+		                input.style.color = '#fff';
+		            });
+
+		            // Update form labels for dark mode
+		            document.querySelectorAll('.form-label').forEach(label => {
+		                label.style.color = '#98a6b3';
+		            });
+
+		            // Update file input for dark mode
+		            const fileLabel = document.querySelector('.file-label');
+		            if (fileLabel) {
+		                fileLabel.style.backgroundColor = '#1e2a3a';
+		                fileLabel.style.borderColor = '#3d5a80';
+		                fileLabel.style.color = '#fff';
+		            }
+		        }
+
+		        function disableDarkMode() {
+		            document.body.classList.remove('dark-mode');
+		            themeContainer.style.backgroundColor = '';
+		            contentCard.style.backgroundColor = '#fff';
+		            contentCard.style.color = '';
+		            themeToggle.style.backgroundColor = '#fff';
+		            moonIcon.classList.replace('fa-sun', 'fa-moon');
+		            moonIcon.style.color = '';
+
+		            // Reset form inputs
+		            document.querySelectorAll('.form-input').forEach(input => {
+		                input.style.backgroundColor = '';
+		                input.style.borderColor = '#dee2e6';
+		                input.style.color = '';
+		            });
+
+		            // Reset form labels
+		            document.querySelectorAll('.form-label').forEach(label => {
+		                label.style.color = '';
+		            });
+
+		            // Reset file input
+		            const fileLabel = document.querySelector('.file-label');
+		            if (fileLabel) {
+		                fileLabel.style.backgroundColor = '#f8f9fa';
+		                fileLabel.style.borderColor = '#dee2e6';
+		                fileLabel.style.color = '';
+		            }
+		        }
+		    });
+		</script>
+
+	</section>
+</body>
+</html>

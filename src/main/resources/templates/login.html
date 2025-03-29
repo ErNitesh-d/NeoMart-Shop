@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section},'Login')}">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Login Page</title>
+</head>
+<body>
+    <section>
+        <style>
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes slideInLeft {
+                from { opacity: 0; transform: translateX(-30px); }
+                to { opacity: 1; transform: translateX(0); }
+            }
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+            @keyframes gradientBG {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+            @keyframes imageRun {
+                0% { transform: translateX(0); } /* Start from its original position */
+                100% { transform: translateX(calc(100vw - 50%)); } /* Move to the right edge of the screen */
+            }
+            html, body {
+                margin: 0;
+                padding: 0;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+                background-size: 400% 400%;
+                animation: gradientBG 15s ease infinite;
+                height: 100%;
+                overflow-x: hidden;
+                position: relative;
+            }
+            input:focus::placeholder {
+                opacity: 0;
+                transform: translateX(10px);
+                transition: all 0.3s ease;
+            }
+            input::placeholder {
+                transition: all 0.3s ease;
+            }
+            #overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                display: none;
+                z-index: 999;
+            }
+            #ecomImage {
+                transition: transform 0.30s ease;
+            }
+            .image-container {
+                position: relative; /* Ensure the image moves relative to its parent */
+                width: 100%;
+                text-align: center;
+            }
+        </style>
+
+        <!-- Overlay for Animation -->
+        <div id="overlay"></div>
+
+        <div style="width: 100%; max-width: 1200px; margin: 7% auto; padding: 0 10px; margin-bottom: 2%;">
+            <div style="display: flex; flex-wrap: wrap; align-items: stretch; justify-content: flex-start; box-shadow: 0 15px 35px rgba(50, 50, 93, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07); border-radius: 12px; overflow: hidden; background-color: #ffffff;">
+                <!-- Left side with image and text -->
+                <div style="flex: 0 0 40%; padding: 20px; background: linear-gradient(45deg, #6a11cb 0%, #2575fc 100%); min-height: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; animation: slideInLeft 0.8s ease;">
+                    <div class="image-container">
+                        <img id="ecomImage" src="img/ecom.png" style="width: 70%; max-width: 300px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.2);" alt="E-commerce illustration">
+                    </div>
+                    <div style="text-align: center; padding: 0 20px;">
+                        <h2 style="font-size: 28px; margin-bottom: 10px; font-weight: 600;">Welcome Back!</h2>
+                        <p style="font-size: 16px; line-height: 1.5;">Log in to continue shopping.</p>
+                    </div>
+                </div>
+
+                <!-- Right side with form -->
+                <div style="flex: 0 0 60%; padding: 20px; animation: fadeIn 0.8s ease;">
+                    <div style="margin-bottom: 20px; text-align: center;">
+                        <h1 style="font-size: 28px; color: #333; margin-bottom: 5px; font-weight: 700;">Login to Your Account</h1>
+                        <p style="color: #666; font-size: 14px;">Enter your credentials below</p>
+                        <!-- Alert messages -->
+                        <div th:if="${param.error}" style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin: 10px 0; border-left: 4px solid #dc3545;">
+                            <p style="margin: 0; font-weight: 500; font-size: 13px;" id="errorMsg">
+                                <th:block th:if="${session.SPRING_SECURITY_LAST_EXCEPTION!=null}">
+                                    [[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]
+                                </th:block>
+                            </p>
+                        </div>
+                        <div th:if="${param.logout}" style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin: 10px 0; border-left: 4px solid #28a745;">
+                            <p style="margin: 0; font-weight: 500; font-size: 13px;">Logout Successful!</p>
+                        </div>
+                    </div>
+
+                    <form id="loginForm" action="/login" method="post" style="background: rgba(255,255,255,0.9); border-radius: 10px; padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); max-width: 400px; margin: auto; transition: all 0.3s ease;">
+                        <div style="margin-bottom: 20px; position: relative;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 500; color: #555; font-size: 14px;">Email</label>
+                            <div style="position: relative;">
+                                <div style="position: absolute; left: 12px; top: 10px; color: #aaa;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                </div>
+                                <input required name="username" type="email" placeholder="email@example.com" style="width: 100%; padding: 10px 12px 10px 40px; border-radius: 6px; border: 2px solid #e0e0e0; background: rgba(255,255,255,0.9); transition: all 0.3s; font-size: 14px; outline: none;" onFocus="this.style.borderColor='#4776E6';" onBlur="this.style.borderColor='#e0e0e0';">
+                            </div>
+                            <span class="error-message" style="color: #ff3e61; font-size: 11px; position: absolute; bottom: -18px; left: 0; display: none;">Please enter a valid email</span>
+                        </div>
+
+                        <div style="margin-bottom: 20px; position: relative;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 500; color: #555; font-size: 14px;">Password</label>
+                            <div style="position: relative;">
+                                <input required name="password" type="password" id="password" placeholder="••••••••" style="width: 100%; padding: 10px 12px; border-radius: 6px; border: 2px solid #e0e0e0; background: rgba(255,255,255,0.9); transition: all 0.3s; font-size: 14px; outline: none;" onFocus="this.style.borderColor='#4776E6';" onBlur="this.style.borderColor='#e0e0e0';">
+                                <div id="togglePassword" onclick="togglePasswordVisibility('password')" style="position: absolute; right: 12px; top: 10px; cursor: pointer; color: #aaa;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                </div>
+                            </div>
+                            <span class="error-message" style="color: #ff3e61; font-size: 11px; position: absolute; bottom: -18px; left: 0; display: none;">Please enter your password</span>
+                        </div>
+
+                        <button type="submit" style="background: linear-gradient(90deg, #4776E6 0%, #8E54E9 100%); color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; transition: all 0.3s; box-shadow: 0 4px 10px rgba(71, 118, 230, 0.3); animation: pulse 1.5s infinite;" 
+                                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(71, 118, 230, 0.4)';" 
+                                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 10px rgba(71, 118, 230, 0.3)';">
+                            Login Now
+                        </button>
+
+                        <div style="text-align: center; margin-top: 15px;">
+                            <a href="/forgot-password" style="color: #4776E6; text-decoration: none; font-weight: 500; font-size: 13px; transition: all 0.3s;" onmouseover="this.style.textDecoration='underline';" onmouseout="this.style.textDecoration='none';">Forgot Password?</a>
+                            <p style="margin-top: 8px; color: #666; font-size: 13px;">Don't have an account? <a href="/register" style="color: #4776E6; text-decoration: none; font-weight: 500; transition: all 0.3s;" onmouseover="this.style.textDecoration='underline';" onmouseout="this.style.textDecoration='none';">Create one</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Password visibility toggle
+            function togglePasswordVisibility(inputId) {
+                const input = document.getElementById(inputId);
+                input.type = input.type === 'password' ? 'text' : 'password';
+                const icon = document.getElementById('toggle' + inputId.charAt(0).toUpperCase() + inputId.slice(1));
+                if (input.type === 'text') {
+                    icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+                } else {
+                    icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+                }
+            }
+
+            // Form submission with animation
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevent default form submission
+
+                // Simple validation
+                const email = document.querySelector('input[name="username"]').value.trim();
+                const password = document.querySelector('input[name="password"]').value.trim();
+
+                if (!email || !password) {
+                    alert('Please fill in both email and password fields.');
+                    return;
+                }
+
+                // Show overlay and animate the existing ecom image
+                const overlay = document.getElementById('overlay');
+                const ecomImage = document.getElementById('ecomImage');
+
+                // Show overlay
+                overlay.style.display = 'block';
+
+                // Apply animation from its current position
+                ecomImage.style.animation = 'imageRun 2s linear forwards';
+
+                // Submit form after animation
+                setTimeout(() => {
+                    this.submit();
+                }, 2000); // Match this with the animation duration (2s)
+            });
+        </script>
+   
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9253bd478a5544d7',t:'MTc0Mjc5MzgzNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</section>
+</body>
+</html>

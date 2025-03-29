@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+th:replace="~{base::layout(~{::section},'Success')}">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Order Success</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+</head>
+<body>
+<section>
+    <div class="container " style="margin-top: 10%;">
+        <div class="row">
+            <div class="col-md-8 offset-md-2 text-center" 
+                 style="background: linear-gradient(135deg, rgb(255, 255, 255) 0%, rgb(255, 255, 255) 100%); 
+                        border-radius: 20px; 
+                        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); 
+                        padding: 3rem; 
+                        margin-bottom: 10%; 
+                        animation: slideUp 0.8s ease forwards; 
+                        transform: translateY(30px); 
+                        opacity: 0;">
+                
+                <i class="fa-solid fa-circle-check fa-6x" 
+                   style="color: #28a745; 
+                          filter: drop-shadow(0 4px 8px rgba(40, 167, 69, 0.3)); 
+                          margin-bottom: 1.5rem; 
+                          animation: bounce 1.5s ease infinite;"></i>
+                
+                <h2 style="color: #343a40; 
+                           font-weight: 700; 
+                           margin-bottom: 1rem; 
+                           animation: fadeIn 1s ease 0.5s forwards; 
+                           opacity: 0;">Order Confirmed!</h2>
+                
+                <p class="fs-4" 
+                   style="color: #6c757d; 
+                          margin-bottom: 2rem; 
+                          animation: fadeIn 1s ease 0.8s forwards; 
+                          opacity: 0;">Your product has been ordered successfully and will be delivered within 7 days.</p>
+                
+                <div style="display: flex; 
+                            justify-content: center; 
+                            gap: 1rem; 
+                            animation: fadeIn 1s ease 1.1s forwards; 
+                            opacity: 0;">
+                    
+                    <a href="/" 
+                       style="background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                              border: none; 
+                              border-radius: 50px; 
+                              color: white; 
+                              padding: 0.8rem 2rem; 
+                              font-weight: 600; 
+                              transition: all 0.3s ease; 
+                              position: relative; 
+                              overflow: hidden; 
+                              z-index: 1; 
+                              box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); 
+                              text-decoration: none; 
+                              display: inline-block;">
+                        <i class="fa-solid fa-house me-2"></i>Back to Home
+                    </a>
+                    
+                    <a href="/user/user-orders" 
+                       style="background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                              border: none; 
+                              border-radius: 50px; 
+                              color: white; 
+                              padding: 0.8rem 2rem; 
+                              font-weight: 600; 
+                              transition: all 0.3s ease; 
+                              position: relative; 
+                              overflow: hidden; 
+                              z-index: 1; 
+                              box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); 
+                              text-decoration: none; 
+                              display: inline-block;">
+                        <i class="fa-solid fa-box me-2"></i>View Your Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+		body {
+		  background-color: #ffffff; /* Pure White */
+		  margin: 0;
+		  padding: 0;
+		}
+		.container {
+		  background-color: transparent; /* Ensure no background */
+		}
+
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create confetti effect
+            createConfetti();
+            
+            // Add hover effects to buttons
+        const buttons = document.querySelector('section').querySelectorAll('a[href]');
+            buttons.forEach(button => {
+                button.addEventListener('mouseover', function() {
+                    this.style.transform = 'translateY(-3px)';
+                    this.style.boxShadow = '0 7px 20px rgba(0, 0, 0, 0.25)';
+                    this.style.backgroundImage = 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)';
+                });
+                
+                button.addEventListener('mouseout', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.2)';
+                    this.style.backgroundImage = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                });
+            });
+        });
+
+        function createConfetti() {
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                const colors = ['#f94144', '#f3722c', '#f8961e', '#f9c74f', '#90be6d', '#43aa8b', '#577590'];
+                
+                confetti.style.position = 'fixed';
+                confetti.style.zIndex = '0';
+                confetti.style.width = (Math.random() * 10 + 5) + 'px';
+                confetti.style.height = (Math.random() * 10 + 5) + 'px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.top = '-20px';
+                
+                // Random shape
+                if (Math.random() > 0.5) {
+                    confetti.style.borderRadius = '50%';
+                }
+                
+                // Animation
+                confetti.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards ${Math.random() * 2}s`;
+                
+                document.body.appendChild(confetti);
+            }
+        }
+
+        // Define the fall animation in document
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fall {
+                to {
+                    transform: translateY(100vh) rotate(720deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</section>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base::layout(~{::section})}">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Order Summary</title>
+</head>
+<body>
+<section>
+    <div class="container mt-5 p-5 card-sh">
+        <form action="/user/purchase" method="post" id="orders" novalidate>
+			
+			<input type="hidden" name="pid" th:value="${product.id}">
+			<input type="hidden" name="uid" th:value="${user.id}">
+
+            <div class="row">
+				<th:block th:if="${session.succMsg}">
+				    <p class="text-success alert alert-success text-center" role="alert">[[${session.succMsg}]]</p>
+				    <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+				</th:block>
+
+				<!-- Error message -->
+				<th:block th:if="${session.errorMsg}">
+				    <p class="text-danger text-center alert alert-danger">[[${session.errorMsg}]]</p>
+				    <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+				</th:block>       <!-- Billing Address -->
+                <div class="col-md-6">
+                    <p class="text-center fs-4">Billing Address</p>
+                    <hr>
+                    <div class="mb-3 row">
+                        <div class="col p-1">
+                            <label>First Name</label>
+                            <input type="text" name="firstName" required class="form-control mt-1">
+                        </div>
+                        <div class="col p-1">
+                            <label>Last Name</label>
+                            <input type="text" name="lastName" required class="form-control mt-1">
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <div class="col p-1">
+                            <label>Email</label>
+                            <input type="email" name="email" required class="form-control col">
+                        </div>
+                        <div class="col p-1">
+                            <label>Mobile Number</label>
+                            <input type="text" name="mobileNo" required class="form-control col ms-2">
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <div class="col p-1">
+                            <label>Address</label>
+                            <input type="text" name="address" required class="form-control col">
+                        </div>
+                        <div class="col p-1">
+                            <label>City</label>
+                            <input type="text" name="city" required class="form-control col ms-2">
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <div class="col p-1">
+                            <label>State</label>
+                            <input type="text" name="state" required class="form-control col">
+                        </div>
+                        <div class="col p-1">
+                            <label>Pincode</label>
+                            <input type="number" name="pincode" required class="form-control col ms-2">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Order Summary -->
+                <div class="col-md-6">
+                    <p class="text-center fs-4">Order Summary</p>
+                    <hr>
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-borderless">
+                                <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Qty</th>
+                                    <th>Total</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="product : ${product}">
+                                    <td th:text="${product.title}"></td>
+                                    <td>&#8377; [[${product.discountPrice}]]</td>
+                                    <td th:text="${1}"></td>
+                                    <td>&#8377; [[${product.discountPrice * 1}]]</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <table class="table">
+                                <tr>
+                                    <td>Subtotal</td>
+                                    <td>:</td>
+                                    <td>&#8377; [[${product.discountPrice}]]</td>
+                                </tr>
+                                <tr>
+                                    <td>Tax</td>
+                                    <td>:</td>
+                                    <td>&#8377; [[${tax}]]</td>
+                                </tr>
+                                <tr>
+                                    <td>Delivery Fee</td>
+                                    <td>:</td>
+                                    <td><span class="badge" style="background: yellow; font-weight: bold; padding: 5px; color: black;">Free Delivery</span></td>
+                                </tr>
+                                <tr class="border-top">
+                                    <td><strong>Total Price</strong></td>
+                                    <td>:</td>
+                                    <td><strong>&#8377; [[${totalOrderPrice}]]</strong></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Section -->
+                    <div class="card shadow p-3 mb-5 mt-2 bg-body-tertiary rounded">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Select Payment Type</label>
+                                <select required name="paymentType" class="form-control">
+                                    <option>--select--</option>
+                                    <option value="COD">Cash On Delivery</option>
+                                    <option value="ONLINE">Online Payment</option>
+                                </select>
+                            </div>
+                            <button class="btn bg-primary text-white col-md-12">Place Order</button>
+							<a th:href="@{'/user/addCartFromBuy?pid=' + ${product.id} + '&uid=' + ${user.id}}" class="btn bg-danger text-white col-md-12 mt-2">Add To Cart</a>
+														 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+</body>
+</html>

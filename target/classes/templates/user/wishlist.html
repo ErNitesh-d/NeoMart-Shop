@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{base::layout(~{::section},'Wishlist')}">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Product Page</title>
+
+</head>
+<body>
+ <section>
+	<!-- Wishlist Container -->
+	<div id="wishlistContainer" style="width: 100%;height: 100%; margin-top: 5%;margin-bottom: 0%; background: #fff; padding: 20px; border-radius: 0px; " class="light-theme">
+	    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h4 style="text-align: center; border-bottom: 1px solid gray; padding-bottom: 2px; position: relative; display: inline-block; left: 50%; transform: translateX(-50%);" class="theme-text">My Wishlist
+                <span style="position: absolute; bottom: -2px; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, transparent, #007bff, transparent);"></span>
+            </h4>
+            <button onclick="toggleTheme()" id="themeToggle" style="border: none; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: all 0.3s ease; background-color: #fff; margin-left: auto;" aria-label="Toggle theme">
+                <i class="fa-solid fa-moon" style="font-size: 1.2rem;"></i> 
+            </button>
+        </div>
+
+	    <!-- Success Message -->
+	    <th:block th:if="${session.succMsg}">
+	        <div style="background-color: rgba(40, 167, 69, 0.1); border-left: 4px solid #28a745; padding: 12px; margin-bottom: 20px; border-radius: 4px; transition: all 0.3s ease; animation: fadeIn 0.5s ease-in-out;">
+                <p class="text-success text-center" role="alert" style="margin: 0; font-weight: 600; color: #28a745;">[[${session.succMsg}]]</p>
+            </div>
+	        <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+	    </th:block>
+
+	    <!-- Error Message -->
+	    <th:block th:if="${session.errorMsg}">
+	        <div style="background-color: rgba(220, 53, 69, 0.1); border-left: 4px solid #dc3545; padding: 12px; margin-bottom: 20px; border-radius: 4px; transition: all 0.3s ease; animation: fadeIn 0.5s ease-in-out;">
+                <p class="text-danger text-center" style="margin: 0; font-weight: 600; color: #dc3545;">[[${session.errorMsg}]]</p>
+            </div>
+	        <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+	    </th:block>
+
+	    <!-- Wishlist Items -->
+	    <div style="overflow-x: auto; padding: 5px; border-radius: 8px; transition: all 0.3s ease;" class="theme-table-container">
+    	    <th:block th:if="${wishlistItems != null and not #lists.isEmpty(wishlistItems)}">
+    	        <div th:each="wishlistItem, stat : ${wishlistItems}" style="width: 100%; transition: all 0.3s ease;" 
+                th:style="${stat.odd} ? 'background-color: rgba(0,0,0,0.02);' : 'background-color: rgba(0,0,0,0);'" class="theme-row">
+    	            <div style="display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #ddd; position: relative; width: 100%; transition: all 0.3s ease;" class="theme-cell">
+    	                <img th:src="@{'/img/product_img/'+${wishlistItem.product.image}}" alt="Product" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+    
+    	                <div style="flex-grow: 1; padding-left: 15px;">
+    	                    <p style="margin: 0; font-size: 16px; font-weight: 600; color: #333; transition: all 0.3s ease;" class="theme-text">
+    	                        <b th:text="${wishlistItem.product.title}"></b>
+    	                    </p>
+    	                    <span th:text="${wishlistItem.product.description}" style="color: #666; transition: all 0.3s ease;" class="theme-text"></span>
+    	                    <p style="margin: 5px 0; font-weight: bold; color: #28a745; transition: all 0.3s ease;" class="theme-price">
+    	                        ₹<span th:text="${wishlistItem.product.discountPrice}"></span>
+    	                        <span style="text-decoration: line-through; color: gray;" th:text="${wishlistItem.product.price}"></span>
+    	                        <span style="color: #28a745;" th:text="${wishlistItem.product.discount}"></span>% off
+    	                    </p>
+    	                    Status:
+    	                    <th:block th:if="${wishlistItem.product.stock > 0}">
+    	                        <span class="badge bg-success" style="transition: all 0.3s ease;">Available</span>
+    	                    </th:block>
+    	                    <th:block th:unless="${wishlistItem.product.stock > 0}">
+    	                        <span class="badge bg-warning" style="transition: all 0.3s ease;">Out of Stock</span>
+    	                    </th:block>
+    	                </div>
+    
+    	                <!-- Added Date at the top-right corner -->
+    	                <span style="position: absolute; top: 5px; right: 10px; font-size: 14px; color: gray; border-bottom: 1px solid gray; padding-bottom: 2px; transition: all 0.3s ease;" class="theme-date">
+    	                    <span style="display: block; font-size: 12px; color: black; transition: all 0.3s ease;" class="theme-text">Since,</span>
+    	                    <span th:text="${wishlistItem.addedDate}" style="transition: all 0.3s ease;" class="theme-text"></span>
+    	                </span>
+    
+    	                <!-- Buttons Row (Add to Cart and Remove) -->
+    	                <div style="display: flex; gap: 10px; margin-top: 10px;">
+    	                    <!-- Add to Cart Button -->
+    	                    <a th:href="@{'/user/addToCartFromWish?pid=' + ${wishlistItem.product.id} + '&uid=' + ${user.id}}"
+    	                       style="background-color: #28a745; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-size: 16px; display: inline-flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); transition: all 0.3s ease;"
+                               onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.2)';" 
+                               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.15)';" 
+                               class="theme-btn">
+    	                        <i class="fa fa-cart-plus" style="margin-right: 5px;"></i> Add To Cart
+    	                    </a>
+    
+    	                    <!-- Remove from Wishlist Button -->
+    	                    <a th:href="@{'/user/wishlist/remove/' + ${wishlistItem.product.id} + '/' + ${user.id}}"
+    	                       style="background-color: #dc3545; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-size: 16px; display: inline-flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); transition: all 0.3s ease;"
+                               onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.2)';" 
+                               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.15)';" 
+                               class="theme-btn-danger">
+    	                        <i class="fa fa-trash" style="margin-right: 5px;"></i> Remove
+    	                    </a>
+    	                </div>
+    	            </div>
+    	        </div>
+    	    </th:block>
+        </div>
+
+	    <!-- Empty Wishlist Message -->
+	    <th:block th:if="${wishlistItems == null or #lists.isEmpty(wishlistItems)}">
+	        <div style="text-align: center; padding: 50px; transition: all 0.3s ease;" class="theme-empty-container">
+	            <i class="fa fa-heart-broken theme-icon" style="font-size: 60px; color: #888; transition: all 0.3s ease;" ></i>
+	            <h3 style="color: #555; margin-top: 10px; transition: all 0.3s ease;" class="theme-text">Your Wishlist is Empty!</h3>
+	            <p style="color: #777; transition: all 0.3s ease;" class="theme-text">Start exploring and adding your favorite products now.</p>
+	            
+	            <!-- Purchase Now Button -->
+	            <a href="/products" style="background-color: #007bff; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-size: 18px; box-shadow: 0 2px 4px rgba(0,0,0,0.15); transition: all 0.3s ease;"
+                   onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.2)';" 
+                   onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.15)';" 
+                   class="theme-btn-primary">
+	                <i class="fa fa-shopping-cart" style="margin-right: 5px;"></i> Purchase Now
+	            </a>
+	        </div>
+	    </th:block>
+	</div>
+
+<!-- jQuery Library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Font Awesome -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+
+<style>
+    /* Global styles */
+    body, html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow-x: hidden;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Pre-load fonts that might be used for icons */
+    @font-face {
+        font-family: 'FontAwesome';
+        font-display: swap;
+        src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/fa-solid-900.woff2') format('woff2');
+    }
+</style>
+
+<script>
+    // Store the theme preference in localStorage
+    function saveThemePreference(isDark) {
+        localStorage.setItem('darkThemePreferred', isDark);
+    }
+    
+    // Get the theme preference from localStorage
+    function getThemePreference() {
+        return localStorage.getItem('darkThemePreferred') === 'true';
+    }
+    
+    // Apply the saved theme preference on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        if (getThemePreference()) {
+            applyDarkTheme();
+        }
+    });
+    
+    function toggleTheme() {
+        const container = document.getElementById('wishlistContainer');
+        
+        if (container.classList.contains('light-theme')) {
+            applyDarkTheme();
+            saveThemePreference(true);
+        } else {
+            applyLightTheme();
+            saveThemePreference(false);
+        }
+    }
+    
+	function applyDarkTheme() {
+	    const container = document.getElementById('wishlistContainer');
+	    const themeButton = document.getElementById('themeToggle');
+	    
+	    // Switch to dark theme
+	    container.classList.remove('light-theme');
+	    container.classList.add('dark-theme');
+	    container.style.background = '#1a1a2e';
+	    container.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.3)';
+	    
+	    // Update text styles
+	    const texts = document.getElementsByClassName('theme-text');
+	    for (let i = 0; i < texts.length; i++) {
+	        texts[i].style.color = '#e0e0e0';
+	    }
+	    
+	    // Update prices
+	    const prices = document.getElementsByClassName('theme-price');
+	    for (let i = 0; i < prices.length; i++) {
+	        prices[i].style.color = '#4CAF50';
+	    }
+	    
+	    // Update table container
+	    const tableContainer = document.getElementsByClassName('theme-table-container');
+	    for (let i = 0; i < tableContainer.length; i++) {
+	        tableContainer[i].style.background = '#1a1a2e';
+	    }
+	    
+	    // Update rows
+	    const rows = document.getElementsByClassName('theme-row');
+	    for (let i = 0; i < rows.length; i++) {
+	        if (i % 2 === 0) {
+	            rows[i].style.backgroundColor = 'rgba(255,255,255,0.03)';
+	        } else {
+	            rows[i].style.backgroundColor = 'rgba(255,255,255,0)';
+	        }
+	    }
+	    
+	    // Update cells
+	    const cells = document.getElementsByClassName('theme-cell');
+	    for (let i = 0; i < cells.length; i++) {
+	        cells[i].style.borderColor = '#444';
+	    }
+	    
+	    // Update dates
+	    const dates = document.getElementsByClassName('theme-date');
+	    for (let i = 0; i < dates.length; i++) {
+	        dates[i].style.color = '#aaa';
+	        dates[i].style.borderColor = '#444';
+	    }
+	    
+	    // Update empty container
+	    const emptyContainers = document.getElementsByClassName('theme-empty-container');
+	    for (let i = 0; i < emptyContainers.length; i++) {
+	        emptyContainers[i].style.color = '#e0e0e0';
+	    }
+	    
+	    // Update buttons
+	    const buttons = document.getElementsByClassName('theme-btn');
+	    for (let i = 0; i < buttons.length; i++) {
+	        buttons[i].style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+	    }
+	    
+	    const dangerButtons = document.getElementsByClassName('theme-btn-danger');
+	    for (let i = 0; i < dangerButtons.length; i++) {
+	        dangerButtons[i].style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+	    }
+	    
+	    const primaryButtons = document.getElementsByClassName('theme-btn-primary');
+	    for (let i = 0; i < primaryButtons.length; i++) {
+	        primaryButtons[i].style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+	    }
+	    
+	    // Update badges
+	    const successBadges = document.getElementsByClassName('badge-bg-success');
+	    for (let i = 0; i < successBadges.length; i++) {
+	        successBadges[i].style.backgroundColor = 'rgba(40,167,69,0.2)';
+	    }
+	    
+	    const warningBadges = document.getElementsByClassName('badge-bg-warning');
+	    for (let i = 0; i < warningBadges.length; i++) {
+	        warningBadges[i].style.backgroundColor = 'rgba(255,193,7,0.2)';
+	    }
+	    
+	    // Update theme toggle button
+	    themeButton.innerHTML = '<i class="fa-solid fa-sun" style="font-size: 1.2rem;"></i>';
+	    themeButton.style.backgroundColor = '#ffc107';
+	    themeButton.style.color = '#212529';
+	}
+    
+    function applyLightTheme() {
+        const container = document.getElementById('wishlistContainer');
+        const themeButton = document.getElementById('themeToggle');
+        
+        // Switch to light theme
+        container.classList.remove('dark-theme');
+        container.classList.add('light-theme');
+        container.style.background = '#fff';
+        container.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
+        
+        // Update text styles
+        const texts = document.getElementsByClassName('theme-text');
+        for (let i = 0; i < texts.length; i++) {
+            texts[i].style.color = '#333';
+        }
+        
+        // Update prices
+        const prices = document.getElementsByClassName('theme-price');
+        for (let i = 0; i < prices.length; i++) {
+            prices[i].style.color = '#28a745';
+        }
+        
+        // Update table container
+        const tableContainer = document.getElementsByClassName('theme-table-container');
+        for (let i = 0; i < tableContainer.length; i++) {
+            tableContainer[i].style.background = 'transparent';
+        }
+        
+        // Update rows
+        const rows = document.getElementsByClassName('theme-row');
+        for (let i = 0; i < rows.length; i++) {
+            if (i % 2 === 0) {
+                rows[i].style.backgroundColor = 'rgba(0,0,0,0.02)';
+            } else {
+                rows[i].style.backgroundColor = 'rgba(0,0,0,0)';
+            }
+        }
+        
+        // Update cells
+        const cells = document.getElementsByClassName('theme-cell');
+        for (let i = 0; i < cells.length; i++) {
+            cells[i].style.borderColor = '#ddd';
+        }
+        
+        // Update dates
+        const dates = document.getElementsByClassName('theme-date');
+        for (let i = 0; i < dates.length; i++) {
+            dates[i].style.color = 'gray';
+            dates[i].style.borderColor = 'gray';
+        }
+        
+        // Update empty container
+        const emptyContainers = document.getElementsByClassName('theme-empty-container');
+        for (let i = 0; i < emptyContainers.length; i++) {
+            emptyContainers[i].style.color = '#1a1a2e';
+        }
+        
+        // Update theme toggle button
+        themeButton.innerHTML = '<i class="fa-solid fa-moon" style="font-size: 1.2rem;"></i>';
+        themeButton.style.backgroundColor = '#fff';
+        themeButton.style.color = '#333';
+    }
+</script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</section>
+</body>
+</html>

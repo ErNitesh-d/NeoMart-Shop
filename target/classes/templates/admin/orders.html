@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{base::layout(~{::section},'All Orders')}">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Admin Orders</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <section>
+        <div id="main-content" style="margin-left: 250px;  transition: margin-left 0.3s ease;">
+            <div class="row" style="margin-top: 5%;">
+                <!-- Orders Details Section -->
+                <div class="col-md-12">
+                    <div style="background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.07); position: relative; overflow: hidden; animation: slideIn 0.8s ease forwards;">
+                        <!-- Background overlay effect -->
+                        <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, rgba(13,110,253,0.1), rgba(106,17,203,0.1)); transform: rotate(30deg); z-index: 1;"></div>
+                        
+                        <!-- Card Header -->
+                        <div style="background: transparent; border-bottom: 3px solid #0d6efd; text-align: center; padding-bottom: 20px; position: relative; z-index: 2;">
+                            <h2 style="font-size: 28px; color: #0d6efd; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 1px;">
+                                <i class="fas fa-shopping-cart" style="margin-right: 10px; margin-top: 15px;"></i>All Orders
+                            </h2>
+                            <th:block th:if="${session.succMsg}">
+                                <p style="color: #198754; font-weight: bold; margin-top: 10px; font-size: 16px; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 10px; box-shadow: 0 2px 10px rgba(25,135,84,0.2);">
+                                    <i class="fas fa-check-circle" style="margin-right: 8px;"></i>[[${session.succMsg}]]
+                                </p>
+                                <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                            </th:block>
+                            <th:block th:if="${session.errorMsg}">
+                                <p style="color: #dc3545; font-weight: bold; margin-top: 10px; font-size: 16px; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 10px; box-shadow: 0 2px 10px rgba(220,53,69,0.2);">
+                                    <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>[[${session.errorMsg}]]
+                                </p>
+                                <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                            </th:block>
+                        </div>
+                        
+                        <!-- Card Body -->
+                        <div style="position: relative; z-index: 2;">
+                            <!-- Search Form -->
+                            <div style="margin-bottom: 10px; margin-top: 10px; padding: 0 15px;">
+                                <form action="/admin/search-order" method="get" style="display: flex; gap: 2px;">
+									<input type="text" name="orderId" class="form-control" 
+									    style="border-radius: 12px; border: 1px solid #ced4da; transition: all 0.3s ease; 
+									           box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); height: 50px; font-size: 14px;"
+									    placeholder="Enter order ID"
+									    onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'">
+
+                                    <button class="btn btn-primary" 
+                                        style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);height: 50px; font-size: 14px; border: none; 
+									 border-radius: 25px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; transition: all 0.4s ease; color: white;" 
+                                        onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(106,17,203,0.4)'" 
+                                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none' ">
+                                        <i class="fas fa-search" style="margin-right: 8px;"></i>Search
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Orders Table -->
+                            <table class="table" style="width: 100%; border-collapse: collapse; margin-bottom: 0; font-size: 15px;">
+                                <thead>
+                                    <tr style="background: #e9ecef; color: #495057;">
+                                        <th style="padding: 8px; text-align: center; font-weight: bold; border-bottom: 2px solid #dee2e6;">Order ID</th>
+                                        <th style="padding: 8px; text-align: center; font-weight: bold; border-bottom: 2px solid #dee2e6;">Delivery Details</th>
+                                        <th style="padding: 8px; text-align: center; font-weight: bold; border-bottom: 2px solid #dee2e6;">Date</th>
+                                        <th style="padding: 8px; text-align: center; font-weight: bold; border-bottom: 2px solid #dee2e6;">Product Details</th>
+                                        <th style="padding: 8px; text-align: center; font-weight: bold; border-bottom: 2px solid #dee2e6;">Price</th>
+                                        <th style="padding: 8px; text-align: center; font-weight: bold; border-bottom: 2px solid #dee2e6;">Status</th>
+                                        <th style="padding: 8px; text-align: center; font-weight: bold; border-bottom: 2px solid #dee2e6;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Search Results -->
+                                    <th:block th:if="${srch}">
+                                        <th:block th:if="${orderDtls!=null}">
+                                            <tr style="transition: all 0.3s ease;" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='transparent'">
+                                                <td style="padding: 8px; text-align: center; color: #495057; border-bottom: 1px solid #dee2e6;">[[${orderDtls.orderId}]]</td>
+                                                <td style="font-size: 16px; color: #333; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                    Name: [[${orderDtls.orderAddress.firstName+' '+orderDtls.orderAddress.lastName}]]<br> 
+                                                    Email: [[${orderDtls.orderAddress.email}]] <br> 
+                                                    Mobile: [[${orderDtls.orderAddress.mobileNo}]] <br> 
+                                                    Address: [[${orderDtls.orderAddress.address}]] <br> 
+                                                    City: [[${orderDtls.orderAddress.city}]] <br> 
+                                                    State: [[${orderDtls.orderAddress.state}]], [[${orderDtls.orderAddress.pincode}]]
+                                                </td>
+                                                <td style="font-size: 16px; color: #333; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">[[${orderDtls.orderDate}]]</td>
+                                                <td style="font-size: 16px; color: #333; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">[[${orderDtls.product.title}]]</td>
+                                                <td style="font-size: 16px; color: #333; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                    Quantity: [[${orderDtls.quantity}]] <br>
+                                                    Price: [[${orderDtls.price}]] <br>
+                                                    Total: [[${orderDtls.quantity * orderDtls.price}]]
+                                                </td>
+                                                <td style="font-size: 16px; color: #333; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                    <span th:text="${orderDtls.status}" class="badge" 
+                                                        th:style="${orderDtls.status == 'DELIVERED'} ? 'background: #28a745; color: white;' : 'background: #dc3545; color: white;'" 
+                                                        style="font-weight: bold; padding: 4px 8px; border-radius: 10px; font-size: 16px;"></span>
+                                                </td>
+                                                <td style="padding: 8px; text-align: center; border-bottom: 1px solid #dee2e6;">
+                                                    <form action="/admin/update-order-status" method="post">
+                                                        <select class="form-control" name="st" style="font-size: px;">
+                                                            <option>--select--</option>
+                                                            <option value="1">IN_PROGRESS</option>
+                                                            <option value="2">ORDER_RECEIVED</option>
+                                                            <option value="3">PRODUCT_PACKED</option>
+                                                            <option value="4">OUT_FOR_DELIVERY</option>
+                                                            <option value="5">DELIVERED</option>
+                                                            <option value="6">CANCELED</option>
+                                                            <option value="8">RETURN_PROCESSING</option>
+                                                            <option value="9">RETURNED</option>
+                                                        </select>
+                                                        <input th:value="${orderDtls.id}" name="id" type="hidden">
+                                                        <button class="btn btn-primary btn-sm mt-1" th:disabled="${orderDtls.status=='CANCELED' || orderDtls.status=='DELIVERED'}"
+                                                            style="background: #6a11cb; border: none;  border-radius: 15px; color: white; transition: all 0.3s ease; font-size: 16px;" 
+                                                            onmouseover="this.style.background='#5a0fa9'" 
+                                                            onmouseout="this.style.background='#6a11cb'">Update</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        </th:block>
+                                        <th:block th:unless="${orderDtls!=null}">
+                                            <tr>
+                                                <td colspan="7" class="text-center text-danger">[[${errorMSg}]]</td>
+                                            </tr>
+                                        </th:block>
+                                    </th:block>
+                                    
+                                    <!-- All Orders -->
+                                    <th:block th:unless="${srch}">
+                                        <tr th:each="o:${orders}" style="transition: all 0.3s ease;" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='transparent'">
+                                            <td style="padding: 8px; text-align: center; color: rgb(0, 0, 0); border-bottom: 1px solid #dee2e6;">
+											[[${orderDtls != null ? orderDtls.orderId : o.orderId}]]</td>
+                                            <td style="font-size: 16px; color: #333; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                Name: [[${o.orderAddress.firstName+' '+o.orderAddress.lastName}]]<br> 
+                                                Email: [[${o.orderAddress.email}]] <br> 
+                                                Mobile: [[${o.orderAddress.mobileNo}]] <br> 
+                                                Address: [[${o.orderAddress.address}]] <br> 
+                                                City: [[${o.orderAddress.city}]] <br> 
+                                                State: [[${o.orderAddress.state}]], [[${o.orderAddress.pincode}]]
+                                            </td>
+                                            <td style="font-size: 16px; color: #333; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">[[${o.orderDate}]]</td>
+                                            <td style="font-size: 16px; color: #333; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">[[${o.product.title}]]</td>
+                                            <td style="font-size: 16px; color: #333; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                Quantity: [[${o.quantity}]] <br>
+                                                Price: [[${o.price}]] <br>
+                                                Total: [[${o.quantity * o.price}]]
+                                            </td>
+                                            <td style="font-size: 16px; color: #333; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                <span th:text="${o.status}" class="badge" 
+                                                    th:style="${o.status == 'DELIVERED'} ? 'background: #28a745; color: white;' : 'background: #dc3545; color: white;'" 
+                                                    style="font-weight: bold; padding: 4px 8px; border-radius: 10px; font-size: 16px;"></span>
+                                            </td>
+                                            <td style="padding: 8px; text-align: center; border-bottom: 1px solid #dee2e6;">
+                                                <form action="/admin/update-order-status" method="post">
+                                                    <select class="form-control" name="st" style="font-size: 16px;">
+                                                        <option>--select--</option>
+                                                        <option value="1">IN_PROGRESS</option>
+                                                        <option value="2">ORDER_RECEIVED</option>
+                                                        <option value="3">PRODUCT_PACKED</option>
+                                                        <option value="4">OUT_FOR_DELIVERY</option>
+                                                        <option value="5">DELIVERED</option>
+                                                        <option value="6">CANCELED</option>
+                                                        <option value="8">RETURN_PROCESSING</option>
+                                                        <option value="9">RETURNED</option>
+                                                    </select>
+                                                    <input th:value="${o.id}" name="id" type="hidden">
+                                                    <input type="hidden" th:value="${pageNo}" name="pageNo">
+                                                    <button class="btn btn-primary btn-sm mt-1" th:disabled="${o.status=='CANCELED' || o.status=='DELIVERED' || o.status=='RETURNED'}"
+                                                        style="background: #6a11cb; border: none; padding: 4px 8px; border-radius: 15px; color: white; transition: all 0.3s ease; font-size: 16px;" 
+                                                        onmouseover="this.style.background='#5a0fa9'" 
+                                                        onmouseout="this.style.background='#6a11cb'">Update</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    </th:block>
+                                </tbody>
+                            </table>
+
+                            <!-- Pagination -->
+							<th:block th:if="${!srch}">
+							    <div class="row" style="padding: 0 15px; align-items: center;">
+							        <!-- Total Orders on the Left -->
+							        <div class="col-md-4" style="font-size: 16px; color: #495057; padding: 8px 0;">
+							            Total Orders: [[${totalElements}]]
+							        </div>
+
+							        <!-- Pagination in the Center -->
+							        <div class="col-md-4" style="display: flex; justify-content: center; padding: 8px 0;">
+							            <nav aria-label="Page navigation">
+							                <ul class="pagination" style="margin: 0;">
+							                    <!-- Previous Button -->
+							                    <li class="page-item" th:classappend="${isFirst} ? 'disabled' : ''">
+							                        <a class="page-link" th:href="@{'/admin/orders?pageNo=' + ${pageNo-1}}" aria-label="Previous"
+							                            style="border-radius: 8px; padding: 12px 18px; color: #6a11cb; border: 1px solid #ced4da; font-size: 16px;">
+							                            «
+							                        </a>
+							                    </li>
+
+							                    <!-- First Page -->
+							                    <li class="page-item" th:classappend="${pageNo == 0} ? 'active' : ''">
+							                        <a class="page-link" th:href="@{'/admin/orders?pageNo=0'}"
+							                            style="border-radius: 8px; padding: 12px 18px; color: #6a11cb; border: 1px solid #ced4da; font-size: 16px;">
+							                            1
+							                        </a>
+							                    </li>
+
+							                    <!-- Dots if necessary -->
+							                    <th:block th:if="${pageNo > 2}">
+							                        <li class="page-item disabled">
+							                            <span class="page-link" style="border-radius: 8px; padding: 12px 18px; font-size: 16px;">...</span>
+							                        </li>
+							                    </th:block>
+
+							                    <!-- Page Numbers in Range -->
+							                    <th:block th:with="start=${pageNo-1 < 1 ? 1 : pageNo-1}, end=${pageNo+1 > totalPages-2 ? totalPages-2 : pageNo+1}">
+							                        <li th:each="i : ${#numbers.sequence(start, end)}" class="page-item" th:classappend="${pageNo == i} ? 'active' : ''">
+							                            <a class="page-link" th:href="@{'/admin/orders?pageNo=' + ${i}}"
+							                                th:style="${pageNo == i} ? 'border-radius: 8px; padding: 12px 18px; background: linear-gradient(135deg, #6a11cb, #2575fc); color: white; font-size: 16px;' : 'border-radius: 8px; padding: 12px 18px; color: #6a11cb; border: 1px solid #ced4da; font-size: 16px;'">
+							                                [[${i+1}]]
+							                            </a>
+							                        </li>
+							                    </th:block>
+
+							                    <!-- Dots Before Last Page -->
+							                    <th:block th:if="${pageNo < totalPages-3}">
+							                        <li class="page-item disabled">
+							                            <span class="page-link" style="border-radius: 8px; padding: 12px 18px; font-size: 16px;">...</span>
+							                        </li>
+							                    </th:block>
+
+							                    <!-- Last Page -->
+							                    <li class="page-item" th:classappend="${pageNo == totalPages-1} ? 'active' : ''">
+							                        <a class="page-link" th:href="@{'/admin/orders?pageNo=' + ${totalPages-1}}"
+							                            style="border-radius: 8px; padding: 12px 18px; color: #6a11cb; border: 1px solid #ced4da; font-size: 16px;">
+							                            [[${totalPages}]]
+							                        </a>
+							                    </li>
+
+							                    <!-- Next Button -->
+							                    <li class="page-item" th:classappend="${isLast} ? 'disabled' : ''">
+							                        <a class="page-link" th:href="@{'/admin/orders?pageNo=' + ${pageNo+1}}" aria-label="Next"
+							                            style="border-radius: 8px; padding: 12px 18px; color: #6a11cb; border: 1px solid #ced4da; font-size: 16px;">
+							                            »
+							                        </a>
+							                    </li>
+							                </ul>
+							            </nav>
+							        </div>
+							    </div>
+							</th:block>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Animation Keyframes -->
+        <script>
+            const styleSheet = document.createElement('style');
+            styleSheet.textContent = `
+                @keyframes slideIn {
+                    from { opacity: 0; transform: translateY(30px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `;
+            document.head.appendChild(styleSheet);
+        </script>
+    </section>
+</body>
+</html>

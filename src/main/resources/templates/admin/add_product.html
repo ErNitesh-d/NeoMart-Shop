@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section},'Add Product')}">
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+	<section>
+		<div id="main-content" style="margin-left: 250px; padding: 20px; transition: margin-left 0.3s ease;">
+			<div class="row"  style=" margin-top: 5%;">
+				<div class="col-md-12 offset-md-3" style="margin-left: 0%; padding: 20px;">
+				    <div style="background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.07); padding: 30px; position: relative; overflow: hidden; animation: slideIn 0.8s ease forwards;">
+				        <!-- Background overlay effect -->
+				        <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, rgba(13,110,253,0.1), rgba(106,17,203,0.1)); transform: rotate(30deg); z-index: 1;"></div>
+				        
+				        <!-- Card Header -->
+				        <div style="background: transparent; border-bottom: 3px solid #0d6efd; text-align: center; padding-bottom: 20px; position: relative; z-index: 2;">
+				            <h2 style="font-size: 28px; color: #0d6efd; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 1px;">
+				                <i class="fas fa-box" style="margin-right: 10px; margin-top: 15px;"></i>Add Product
+				            </h2>
+				            <th:block th:if="${session.succMsg}">
+				                <p style="color: #198754; font-weight: bold; margin-top: 10px; font-size: 16px; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 10px; box-shadow: 0 2px 10px rgba(25,135,84,0.2);">
+				                    <i class="fas fa-check-circle" style="margin-right: 8px;"></i>[[${session.succMsg}]]
+				                </p>
+				                <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+				            </th:block>
+				            <th:block th:if="${session.errorMsg}">
+				                <p style="color: #dc3545; font-weight: bold; margin-top: 10px; font-size: 16px; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 10px; box-shadow: 0 2px 10px rgba(220,53,69,0.2);">
+				                    <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>[[${session.errorMsg}]]
+				                </p>
+				                <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+				            </th:block>
+				        </div>
+				        
+				        <!-- Card Body -->
+				        <div style="padding: 25px; position: relative; z-index: 2;">
+				            <form action="/admin/saveProduct" method="post" enctype="multipart/form-data">
+				                <div style="margin-bottom: 20px;">
+				                    <label style="font-weight: 600; color: #495057; margin-bottom: 8px; display: block;">
+				                        <i class="fas fa-tag" style="margin-right: 8px; color: #6a11cb;"></i>Enter Title
+				                    </label>
+				                    <input type="text" name="title" class="form-control" 
+				                        style="border-radius: 12px; padding: 12px 15px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);" 
+				                        placeholder="Enter product title" 
+				                        onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'" 
+				                        onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='inset 0 1px 3px rgba(0,0,0,0.05)'">
+				                </div>
+
+				                <div style="margin-bottom: 20px;">
+				                    <label style="font-weight: 600; color: #495057; margin-bottom: 8px; display: block;">
+				                        <i class="fas fa-align-left" style="margin-right: 8px; color: #6a11cb;"></i>Enter Description
+				                    </label>
+				                    <textarea rows="3" class="form-control" name="description" 
+				                        style="border-radius: 12px; padding: 12px 15px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); resize: vertical;" 
+				                        placeholder="Enter product description" 
+				                        onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'" 
+				                        onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='inset 0 1px 3px rgba(0,0,0,0.05)'"></textarea>
+				                </div>
+
+				                <div style="margin-bottom: 20px;">
+				                    <label style="font-weight: 600; color: #495057; margin-bottom: 8px; display: block;">
+				                        <i class="fas fa-list" style="margin-right: 8px; color: #6a11cb;"></i>Category
+				                    </label>
+				                    <select class="form-control" name="category" 
+				                        style="border-radius: 12px; padding: 12px 15px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);" 
+				                        onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'" 
+				                        onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='inset 0 1px 3px rgba(0,0,0,0.05)'">
+				                        <option>--select--</option>
+				                        <option th:each="c:${categories}">[[${c.name}]]</option>
+				                    </select>
+				                </div>
+
+				                <div style="margin-bottom: 20px;">
+				                    <label style="font-weight: 600; color: #495057; margin-bottom: 8px; display: block;">
+				                        <i class="fas fa-dollar-sign" style="margin-right: 8px; color: #6a11cb;"></i>Enter Price
+				                    </label>
+				                    <input type="number" name="price" class="form-control" 
+				                        style="border-radius: 12px; padding: 12px 15px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);" 
+				                        placeholder="Enter price" 
+				                        onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'" 
+				                        onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='inset 0 1px 3px rgba(0,0,0,0.05)'">
+				                </div>
+
+				                <div style="margin-bottom: 20px;">
+				                    <label style="font-weight: 600; color: #495057; margin-bottom: 8px; display: block;">
+				                        <i class="fas fa-toggle-on" style="margin-right: 8px; color: #6a11cb;"></i>Status
+				                    </label>
+				                    <div class="form-check" style="margin-bottom: 10px;">
+				                        <input class="form-check-input" type="radio" checked value="true" name="isActive" id="flexRadioDefault1" 
+				                            style="margin-right: 8px;">
+				                        <label class="form-check-label" for="flexRadioDefault1" 
+				                            style="color: #495057;">Active</label>
+				                    </div>
+				                    <div class="form-check">
+				                        <input class="form-check-input" type="radio" name="isActive" value="false" id="flexRadioDefault2" 
+				                            style="margin-right: 8px;">
+				                        <label class="form-check-label" for="flexRadioDefault2" 
+				                            style="color: #495057;">Inactive</label>
+				                    </div>
+				                </div>
+
+				                <div style="margin-bottom: 20px;" class="row">
+				                    <div class="mb-3 col">
+				                        <label style="font-weight: 600; color: #495057; margin-bottom: 8px; display: block;">
+				                            <i class="fas fa-cubes" style="margin-right: 8px; color: #6a11cb;"></i>Enter Stock
+				                        </label>
+				                        <input type="text" name="stock" class="form-control" 
+				                            style="border-radius: 12px; padding: 12px 15px; border: 1px solid #ced4da; transition: all 0.3s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);" 
+				                            placeholder="Enter stock quantity" 
+				                            onfocus="this.style.borderColor='#6a11cb'; this.style.boxShadow='0 0 8px rgba(106,17,203,0.3)'" 
+				                            onblur="this.style.borderColor='#ced4da'; this.style.boxShadow='inset 0 1px 3px rgba(0,0,0,0.05)'">
+				                    </div>
+				                    <div class="mb-3 col">
+				                        <label style="font-weight: 600; color: #495057; margin-bottom: 8px; display: block;">
+				                            <i class="fas fa-image" style="margin-right: 8px; color: #6a11cb;"></i>Upload Image
+				                        </label>
+				                        <div style="position: relative; overflow: hidden;">
+				                            <button type="button" 
+				                                style="background: #f8f9fa; border: 2px dashed #ced4da; border-radius: 12px; padding: 12px 15px; color: #6a11cb; width: 100%; text-align: left; transition: all 0.3s ease;" 
+				                                onmouseover="this.style.background='#e9ecef'" 
+				                                onmouseout="this.style.background='#f8f9fa'">
+				                                <i class="fas fa-upload" style="margin-right: 8px;"></i>Choose File
+				                            </button>
+				                            <input type="file" name="file" class="form-control" 
+				                                style="position: absolute; top: 0; left: 0; opacity: 0; width: 100%; height: 100%;" 
+				                                onchange="this.previousElementSibling.innerHTML = '<i class=\'fas fa-upload\' style=\'margin-right: 8px;\'></i>' + (this.files[0].name || 'Choose File')">
+				                        </div>
+				                    </div>
+				                </div>
+
+				                <button class="btn btn-primary col-md-12" type="submit" 
+				                    style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); border: none; padding: 14px; border-radius: 25px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; transition: all 0.4s ease; color: white;" 
+				                    onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(106,17,203,0.4)'" 
+				                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+				                    <i class="fas fa-save" style="margin-right: 8px;"></i>Submit
+				                </button>
+				            </form>
+				        </div>
+				    </div>
+				</div>
+
+				<!-- Animation Keyframes (Required for slideIn effect) -->
+				<script>
+				    const styleSheet = document.createElement('style');
+				    styleSheet.textContent = `
+				        @keyframes slideIn {
+				            from { opacity: 0; transform: translateY(30px); }
+				            to { opacity: 1; transform: translateY(0); }
+				        }
+				    `;
+				    document.head.appendChild(styleSheet);
+				</script>
+			</div>
+		</div>
+	</section>
+</body>
+</html>
