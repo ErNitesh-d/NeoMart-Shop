@@ -5,6 +5,7 @@ NeoMart is a fully functional e-commerce web application designed to provide a s
 Built with Java Spring Boot, Thymeleaf, HTML, CSS, JavaScript, and MySQL, NeoMart ensures a smooth, secure, and user-friendly interface for both customers and administrators.
 
 🛍 Key Features
+
 ✅ Product Listing & Categories – Browse products categorized for easy navigation.
 
 ✅ Search Functionality – Quickly find products using Elasticsearch integration.
